@@ -263,10 +263,18 @@
 
       <div class="kpi verde">
         <div class="kpi-icon">♻️</div>
-        <div class="kpi-label">Conversión Cruzada</div>
+        <div class="kpi-label">Conversión Cruzada Real</div>
         <div class="kpi-value">320</div>
-        <div class="kpi-sub">Clientes que facturaron otra patente</div>
+        <div class="kpi-sub">Con facturación confirmada en CRM</div>
         <span class="kpi-badge badge-verde">2,6%</span>
+      </div>
+
+      <div class="kpi azul">
+        <div class="kpi-icon">🎯</div>
+        <div class="kpi-label">Potencial Cruzado</div>
+        <div class="kpi-value">519</div>
+        <div class="kpi-sub">Con reserva activa en otra patente</div>
+        <span class="kpi-badge badge-naranja">4,2%</span>
       </div>
 
     </div>
@@ -1134,14 +1142,18 @@ new Chart(document.getElementById('chartRentabilidadMktpl'), {
         position: 'bottom',
         labels: {
           font: { size:12 },
+          usePointStyle: true,
           generateLabels: function(chart) {
             const labels = Chart.defaults.plugins.legend.labels.generateLabels(chart);
             labels.forEach(label => {
-              if (chart.data.datasets[label.datasetIndex].type === 'line') {
+              const ds = chart.data.datasets[label.datasetIndex];
+              if (ds.type === 'line') {
                 label.pointStyle  = 'line';
                 label.lineWidth   = 2;
                 label.strokeStyle = C.azul;
                 label.fillStyle   = 'transparent';
+              } else {
+                label.pointStyle = 'rect';
               }
             });
             return labels;
