@@ -49,9 +49,27 @@
   /* ── KPI Cards ───────────────────────────────────────────────── */
   .kpi-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(8, 1fr);
     gap: 16px;
   }
+  @media (max-width: 1100px) {
+    .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (max-width: 700px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  .kpi-featured {
+    grid-column: span 2;
+    background: linear-gradient(135deg, #c00000 0%, #e53030 100%) !important;
+    border-color: #c00000 !important;
+    color: #fff;
+  }
+  .kpi-featured::before { background: #fff !important; opacity: .25; height: 5px; }
+  .kpi-featured .kpi-label { color: rgba(255,255,255,.8) !important; }
+  .kpi-featured .kpi-sub   { color: rgba(255,255,255,.7) !important; }
+  .kpi-featured .kpi-value { color: #fff !important; font-size: 2.8rem !important; }
+  .kpi-featured .kpi-icon  { font-size: 2rem; }
+  .kpi-featured .kpi-badge { background: rgba(255,255,255,.2) !important; color: #fff !important; font-size: .85rem; }
   .kpi {
     background: #fff; border-radius: 12px;
     border: 1px solid var(--borde); padding: 22px 20px;
@@ -209,12 +227,12 @@
         <div class="kpi-sub">Interés genérico o marca/modelo</div>
       </div>
 
-      <div class="kpi naranja">
+      <div class="kpi kpi-featured">
         <div class="kpi-icon">🚫</div>
         <div class="kpi-label">Leads Post-Reserva</div>
         <div class="kpi-value">12.499</div>
-        <div class="kpi-sub">Llegaron al auto ya reservado</div>
-        <span class="kpi-badge badge-rojo">19,1%</span>
+        <div class="kpi-sub">De los leads con patente, llegaron cuando el auto ya estaba reservado</div>
+        <span class="kpi-badge">19,1% de leads con patente</span>
       </div>
 
       <div class="kpi rojo">
@@ -274,6 +292,8 @@
             <th>Patente</th>
             <th>Marca</th>
             <th>Modelo</th>
+            <th>Año</th>
+            <th>Kilometraje</th>
             <th>Leads Post-Reserva</th>
           </tr>
         </thead>
@@ -674,33 +694,46 @@ new Chart(document.getElementById('chartMarcas'), {
   },
   options: {
     ...dflt, indexAxis:'y',
-    plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: ctx => ` ${ctx.parsed.x.toLocaleString('es-CL')} leads` } } },
-    scales: { x:{ beginAtZero:true, ticks:{ callback: v => v.toLocaleString('es-CL') } }, y:{ grid:{display:false} } }
+    plugins: {
+      legend:{display:false},
+      tooltip:{ callbacks:{ label: ctx => ` ${ctx.parsed.x.toLocaleString('es-CL')} leads` } },
+      datalabels: {
+        display: true,
+        anchor: 'end', align: 'end',
+        color: '#1a1a2e',
+        font: { weight:'bold', size:11 },
+        formatter: v => v.toLocaleString('es-CL'),
+      }
+    },
+    scales: { x:{ beginAtZero:true, ticks:{ callback: v => v.toLocaleString('es-CL') }, max: 11000 }, y:{ grid:{display:false} } }
   }
 });
 
 // ── 4. Tabla patentes ─────────────────────────────────────────────
 const topPat = [
-  { pat:'HFYS87', marca:'Suzuki',  modelo:'Swift',          leads:282 },
-  { pat:'KBYW46', marca:'Kia',     modelo:'Rio 5',          leads:222 },
-  { pat:'JTKC50', marca:'Suzuki',  modelo:'Alto',           leads:175 },
-  { pat:'RRTX66', marca:'Renault', modelo:'Kwid',           leads:110 },
-  { pat:'JXPV17', marca:'Hyundai', modelo:'Grand I10',      leads:104 },
-  { pat:'PTCB60', marca:'Peugeot', modelo:'208 Style',      leads: 85 },
-  { pat:'SBSB20', marca:'Gac',     modelo:'Gs4 Power',      leads: 70 },
-  { pat:'HHVF53', marca:'Toyota',  modelo:'4Runner',        leads: 69 },
-  { pat:'LLJL56', marca:'Subaru',  modelo:'Impreza Sedan',  leads: 68 },
-  { pat:'JRWD41', marca:'Peugeot', modelo:'3008',           leads: 68 },
+  { pat:'HFYS87', marca:'Suzuki',  modelo:'Swift',          anio:2015, km:null, leads:282 },
+  { pat:'KBYW46', marca:'Kia',     modelo:'Rio 5',          anio:2018, km:null, leads:222 },
+  { pat:'JTKC50', marca:'Suzuki',  modelo:'Alto',           anio:2017, km:null, leads:175 },
+  { pat:'RRTX66', marca:'Renault', modelo:'Kwid',           anio:2022, km:null, leads:110 },
+  { pat:'JXPV17', marca:'Hyundai', modelo:'Grand I10',      anio:2018, km:null, leads:104 },
+  { pat:'PTCB60', marca:'Peugeot', modelo:'208 Style',      anio:2021, km:null, leads: 85 },
+  { pat:'SBSB20', marca:'Gac',     modelo:'Gs4 Power',      anio:2022, km:null, leads: 70 },
+  { pat:'HHVF53', marca:'Toyota',  modelo:'4Runner',        anio:2015, km:null, leads: 69 },
+  { pat:'LLJL56', marca:'Subaru',  modelo:'Impreza Sedan',  anio:2019, km:null, leads: 68 },
+  { pat:'JRWD41', marca:'Peugeot', modelo:'3008',           anio:2017, km:null, leads: 68 },
 ];
 const maxLeads = topPat[0].leads;
 const tbody = document.getElementById('tablaPatentes');
 topPat.forEach((r, i) => {
   const pct = Math.round(r.leads / maxLeads * 100);
+  const kmCell = r.km != null ? r.km.toLocaleString('es-CL') + ' km' : '<span style="color:#aaa;">—</span>';
   tbody.innerHTML += `<tr>
     <td class="rank">${i+1}</td>
     <td><strong>${r.pat}</strong></td>
     <td>${r.marca}</td>
     <td>${r.modelo}</td>
+    <td style="font-weight:600;">${r.anio}</td>
+    <td>${kmCell}</td>
     <td>
       <div class="bar-cell">
         <div class="mini-bar" style="width:${pct}px;max-width:120px;"></div>
@@ -714,25 +747,25 @@ topPat.forEach((r, i) => {
 new Chart(document.getElementById('chartModelos'), {
   type: 'bar',
   data: {
-    labels: ['Chevrolet Sail','MG ZS','Suzuki Swift','MG 3','Kia Morning','Chevrolet Tracker','Peugeot 3008','Mitsubishi L200','Chery Tiggo 2','Toyota RAV4'],
+    labels: ['Chevrolet Sail','MG ZS','Suzuki Swift','MG 3','Kia Morning','Chev. Tracker','Peugeot 3008','Mitsubishi L200','Chery Tiggo 2','Toyota RAV4'],
     datasets: [{ label:'Leads', data:[2392,1506,1305,1235,1167,1130,1089,1087,1010,939],
-      backgroundColor: C.serie, borderRadius:4 }]
+      backgroundColor: C.serie, borderRadius:6 }]
   },
   options: {
-    ...dflt, indexAxis:'y',
+    ...dflt,
     plugins: {
-      legend:{display:false},
-      tooltip:{ callbacks:{ label: ctx => ` ${ctx.parsed.x.toLocaleString('es-CL')} leads` } },
+      legend:{ display:false },
+      tooltip:{ callbacks:{ label: ctx => ` ${ctx.parsed.y.toLocaleString('es-CL')} leads` } },
       datalabels: {
-        anchor: 'end', align: 'end',
+        anchor: 'end', align: 'top',
         color: '#1a1a2e',
         font: { weight:'bold', size:11 },
         formatter: v => v.toLocaleString('es-CL'),
       }
     },
     scales: {
-      x:{ beginAtZero:true, ticks:{ callback: v => v.toLocaleString('es-CL') }, max: 2700 },
-      y:{ grid:{display:false} }
+      x:{ grid:{ display:false }, ticks:{ font:{ size:11 }, maxRotation:35, minRotation:35 } },
+      y:{ beginAtZero:true, max:2700, ticks:{ callback: v => v.toLocaleString('es-CL') } }
     }
   }
 });
