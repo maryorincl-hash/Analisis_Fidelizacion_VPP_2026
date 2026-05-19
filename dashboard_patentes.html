@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -435,29 +435,78 @@
             <td><strong>Marketplace (Chileautos)</strong></td>
             <td><strong>4.602</strong></td><td>$4.462 c/IVA</td>
             <td><strong style="color:var(--rojo);">$20.534.124</strong></td>
-            <td>~250</td><td><strong style="color:var(--rojo);">$82.136</strong></td>
+            <td>~191</td><td><strong style="color:var(--rojo);">$107.509</strong></td>
             <td style="color:var(--rojo); font-weight:700;">⛔ Baja al reservar</td>
           </tr>
           <tr style="background:#e8f5e2;">
             <td><strong>Sitio Web Propio</strong></td>
             <td><strong>7.302</strong></td><td>$3.500</td>
             <td><strong style="color:#3d7a1a;">$25.557.000</strong></td>
-            <td>~397</td><td><strong style="color:#3d7a1a;">$64.375</strong></td>
+            <td>~303</td><td><strong style="color:#3d7a1a;">$84.347</strong></td>
             <td style="color:#b07000; font-weight:700;">⚠️ Redirigir a similares</td>
           </tr>
           <tr>
-            <td>Otros canales</td><td>595</td><td>—</td><td>—</td><td>~32</td><td>—</td>
+            <td>Otros canales</td><td>595</td><td>—</td><td>—</td><td>~25</td><td>—</td>
             <td>Gestión manual</td>
           </tr>
           <tr style="background:#1F3A6E; color:#fff;">
             <td><strong>TOTAL</strong></td>
             <td><strong>12.499</strong></td><td>—</td>
             <td><strong>$46.091.124</strong></td>
-            <td><strong>679</strong></td>
-            <td><strong>$67.880</strong></td><td>—</td>
+            <td><strong>519</strong></td>
+            <td><strong>$88.808</strong></td><td>—</td>
           </tr>
         </tbody>
       </table>
+    </div>
+  </section>
+
+  <!-- ── RENTABILIDAD MENSUAL MARKETPLACE ─────────────────────── -->
+  <section>
+    <h2>Rentabilidad mensual — Canal Marketplace</h2>
+
+    <div class="insight-box" style="border-color:var(--azul2);">
+      <div class="icon">⚖️</div>
+      <div>
+        <p>
+          <strong>Cómo leer este gráfico:</strong> las barras hacia <strong style="color:var(--rojo);">abajo</strong> son el costo mensual en leads post-reserva de Marketplace (leads × $4.462 c/IVA). Las barras hacia <strong style="color:#3d7a1a;">arriba</strong> son el margen estimado de ventas cruzadas desde ese mismo canal (~250 autos × $1.300.000, distribuidos proporcionalmente al volumen mensual). El balance positivo confirma que el canal es rentable incluso incluyendo el costo del tráfico que llega a patentes ya reservadas.
+        </p>
+      </div>
+    </div>
+
+    <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); margin-bottom:20px;">
+      <div class="kpi rojo">
+        <div class="kpi-icon">💸</div>
+        <div class="kpi-label">Costo total Marketplace</div>
+        <div class="kpi-value" style="font-size:1.6rem;">$20.534.124</div>
+        <div class="kpi-sub">5 meses · leads post-reserva × CPL $4.462</div>
+      </div>
+      <div class="kpi verde">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-label">Margen ventas cruzadas</div>
+        <div class="kpi-value" style="font-size:1.6rem;">$325.000.000</div>
+        <div class="kpi-sub">~250 autos × $1.300.000 c/u</div>
+      </div>
+      <div class="kpi azul">
+        <div class="kpi-icon">📊</div>
+        <div class="kpi-label">Balance neto 5 meses</div>
+        <div class="kpi-value" style="font-size:1.6rem;">$304.465.876</div>
+        <div class="kpi-sub">Margen − costo post-reserva</div>
+      </div>
+      <div class="kpi amarillo">
+        <div class="kpi-icon">📈</div>
+        <div class="kpi-label">ROI del canal</div>
+        <div class="kpi-value" style="font-size:1.6rem;">15,8×</div>
+        <div class="kpi-sub">Por cada $1 gastado se recuperan $15,8</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Costo vs. margen mensual — Marketplace post-reserva</h3>
+      <div class="card-sub">Barras hacia abajo = gasto en leads post-reserva · Barras hacia arriba = margen estimado ventas cruzadas (autos vendidos × $1.300.000)</div>
+      <div class="chart-wrap tall" style="height:340px;">
+        <canvas id="chartRentabilidadMktpl"></canvas>
+      </div>
     </div>
   </section>
 
@@ -469,7 +518,7 @@
       <div class="icon">📈</div>
       <div>
         <p>
-          <strong>Lectura clave de las tasas de cierre:</strong> los leads post-reserva convierten al <strong>5,4% en venta cruzada</strong>.
+          <strong>Lectura clave de las tasas de cierre:</strong> los leads post-reserva convierten al <strong>4,2% en venta cruzada</strong>.
           Comparado con las tasas de cierre normales por origen (2,4–5,3% en el período Jan–May 2026),
           esta conversión cruzada está <strong>por encima del canal de menor conversión y dentro del rango del de mayor conversión</strong>.
           Esto confirma que el lead no se "pierde" si se gestiona activamente — el problema es el costo de capturarlo cuando el auto ya no está disponible.
@@ -496,7 +545,7 @@
 
     <div class="card">
       <h3>Comparación: conversión post-reserva vs. conversión normal por canal</h3>
-      <div class="card-sub">¿En qué contexto está el 5,4% de conversión cruzada?</div>
+      <div class="card-sub">¿En qué contexto está el 4,2% de conversión cruzada?</div>
       <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-top:16px;">
         <div style="text-align:center; padding:20px; background:#f0f4ff; border-radius:10px; border:2px solid var(--azul2);">
           <div style="font-size:2rem; font-weight:800; color:var(--azul2);">~2,4%</div>
@@ -509,7 +558,7 @@
           <div style="font-size:.78rem; color:#444;">Promedio Ene–May 2026<br>Leads normales del canal</div>
         </div>
         <div style="text-align:center; padding:20px; background:#e8f5e2; border-radius:10px; border:2px solid var(--verde);">
-          <div style="font-size:2rem; font-weight:800; color:var(--verde);">5,4%</div>
+          <div style="font-size:2rem; font-weight:800; color:var(--verde);">4,2%</div>
           <div style="font-size:.8rem; font-weight:700; color:#6b7a90; margin:6px 0;">Conversión Cruzada</div>
           <div style="font-size:.78rem; color:#444;">Leads post-reserva<br>que compraron otra patente</div>
         </div>
@@ -519,7 +568,7 @@
           <strong>Conclusión:</strong> el lead post-reserva bien gestionado convierte <strong>mejor que el canal de web propio normal (2,4%)</strong>
           y similar al marketplace (4,3%). Esto justifica no "apagar" sino <strong>optimizar la gestión</strong>:
           el cliente tiene intención real de compra, pero llega a un auto que ya no está disponible.
-          Con una propuesta de alternativas activa, ese 5,4% tiene potencial de subir.
+          Con una propuesta de alternativas activa, ese 4,2% tiene potencial de subir.
         </p>
       </div>
     </div>
@@ -549,7 +598,7 @@
           <em>"Este auto ya fue apartado"</em> y debajo un carrusel con 3–5 unidades
           disponibles del mismo segmento/precio.<br><br>
           <strong>Costo adicional:</strong> $0 (tráfico ya existe)<br>
-          <strong>Potencial:</strong> si la conversión cruzada sube de 5,4% a 8%, son ~240 ventas adicionales/5 meses<br>
+          <strong>Potencial:</strong> si la conversión cruzada sube de 4,2% a 8%, son ~475 ventas adicionales/5 meses<br>
           <strong>Impacto en CX:</strong> muy positivo — el cliente recibe una solución, no un rechazo
         </p>
       </div>
@@ -568,14 +617,18 @@
       </div>
 
       <div class="card" style="border-top:4px solid var(--azul2);">
-        <h3 style="color:var(--azul);">PROPUESTA 3 — Reasignar presupuesto mktpl a unidades sin tracción</h3>
-        <div class="card-sub">Acción: Pauta digital · Responsable: Marketing</div>
+        <h3 style="color:var(--azul);">PROPUESTA 3 — Mantener aviso en Marketplace como imán de conversión cruzada</h3>
+        <div class="card-sub">Acción: Pauta digital + Proceso comercial · Responsable: Marketing + Ventas Usados</div>
         <p style="font-size:.85rem; line-height:1.7; color:#333; margin-top:10px;">
-          Con el ahorro de <strong>~$4.106.825/mes</strong> al no pagar leads de unidades reservadas en marketplace,
-          invertir en publicar o pautar unidades con <strong>menos de 10 leads en el período</strong>
-          y más de 30 días en inventario.<br><br>
-          Criterio de selección: unidades con precio competitivo pero baja visibilidad orgánica.<br><br>
-          <strong>Resultado esperado:</strong> mayor rotación de stock estático sin aumentar presupuesto total de pauta.
+          Las unidades reservadas que permanecen publicadas en Marketplace generan un
+          <strong>4,2% de conversión cruzada</strong> — clientes que consultan por un auto reservado y terminan comprando
+          una unidad distinta. Este tráfico ya está pagado y posicionado: darlo de baja es desperdiciar demanda calificada.<br><br>
+          <strong>Acciones concretas:</strong><br>
+          · Actualizar título del aviso a <em>"RESERVADO — Consulta alternativas similares"</em><br>
+          · Incluir CTA a WhatsApp en la descripción para capturar el lead antes de que busque en la competencia<br>
+          · Activar flujo diferenciado en CRM: leads con patente reservada → guión de alternativas vía WhatsApp<br><br>
+          <strong>Resultado esperado:</strong> elevar la conversión cruzada del 4,2% actual sin costo adicional de pauta,
+          convirtiendo cada aviso reservado en un punto de entrada de demanda calificada para el stock disponible.
         </p>
       </div>
 
@@ -604,11 +657,11 @@
             <td style="font-weight:700; color:var(--amarillo);">🟡 Media</td>
           </tr>
           <tr style="background:#f0f4ff;">
-            <td>3</td><td>Reasignar presupuesto a unidades sin tracción</td>
-            <td>Bajo (ajuste de pauta)</td>
-            <td style="color:var(--verde); font-weight:700;">~$4M/mes reasignado</td>
-            <td>Neutro</td>
-            <td style="font-weight:700; color:var(--azul2);">🔵 Media-Alta</td>
+            <td>3</td><td>Mantener aviso Marketplace — conversión cruzada activa</td>
+            <td>Bajo (ajuste de texto + flujo CRM)</td>
+            <td style="color:var(--verde); font-weight:700;">+ventas cruzadas sin pauta extra</td>
+            <td style="color:var(--verde);">Muy positivo</td>
+            <td style="font-weight:700; color:var(--azul2);">🔵 Alta</td>
           </tr>
         </tbody>
       </table>
@@ -874,7 +927,7 @@ new Chart(document.getElementById('chartCierrePropio'), {
     datasets: [
       { label:'Cierre digital asignado', data:[2.2,1.7,0.9,1.3,2.3,2.2,2.4,2.5,2.5,1.6,3.0,2.8,2.4],
         borderColor: C.azul2, backgroundColor: C.azul2+'33', tension:.4, pointRadius:4, pointHoverRadius:6, fill:true },
-      { label:'Conversión cruzada post-reserva', data:[null,null,null,null,null,null,null,null,5.4,5.4,5.4,5.4,5.4],
+      { label:'Conversión cruzada post-reserva', data:[null,null,null,null,null,null,null,null,4.2,4.2,4.2,4.2,4.2],
         borderColor: C.verde, borderDash:[6,4], tension:0, pointRadius:3, fill:false }
     ]
   },
@@ -897,7 +950,7 @@ new Chart(document.getElementById('chartCierreMktpl'), {
     datasets: [
       { label:'Cierre digital asignado', data:[6.2,5.4,2.0,2.7,3.9,4.5,4.4,3.8,4.3,4.7,4.4,5.3,3.1],
         borderColor: C.azul2, backgroundColor: C.azul2+'33', tension:.4, pointRadius:4, pointHoverRadius:6, fill:true },
-      { label:'Conversión cruzada post-reserva', data:[null,null,null,null,null,null,null,null,5.4,5.4,5.4,5.4,5.4],
+      { label:'Conversión cruzada post-reserva', data:[null,null,null,null,null,null,null,null,4.2,4.2,4.2,4.2,4.2],
         borderColor: C.verde, borderDash:[6,4], tension:0, pointRadius:3, fill:false }
     ]
   },
@@ -908,6 +961,113 @@ new Chart(document.getElementById('chartCierreMktpl'), {
     scales: {
       x:{ grid:{display:false}, ticks:{ font:{size:9} } },
       y:{ beginAtZero:true, ticks:{ callback: v => v+'%' }, max:10 }
+    }
+  }
+});
+
+// ── 12. Rentabilidad mensual Marketplace ──────────────────────────
+const costoMktplMes  = [4476564, 5789070, 3352572, 2790252, 2768174];
+const ventasCruzadas = [58, 76, 44, 36, 36]; // ~250 distribuidas prop. al volumen de leads
+const margenMktplMes = ventasCruzadas.map(v => v * 1300000);
+const balanceMes     = margenMktplMes.map((m, i) => m - costoMktplMes[i]);
+
+new Chart(document.getElementById('chartRentabilidadMktpl'), {
+  type: 'bar',
+  data: {
+    labels: ['Enero','Febrero','Marzo','Abril','Mayo'],
+    datasets: [
+      {
+        label: 'Margen ventas cruzadas ($)',
+        data: margenMktplMes,
+        backgroundColor: C.verde,
+        borderRadius: 4,
+        yAxisID: 'y',
+        order: 2,
+        datalabels: {
+          color: '#fff', font: { weight:'bold', size:11 },
+          formatter: v => '+$' + (v/1000000).toFixed(1) + 'M',
+          anchor: 'center', align: 'center',
+        }
+      },
+      {
+        label: 'Costo leads post-reserva ($)',
+        data: costoMktplMes.map(v => -v),
+        backgroundColor: C.rojo,
+        borderRadius: 4,
+        yAxisID: 'y',
+        order: 2,
+        datalabels: {
+          color: '#fff', font: { weight:'bold', size:11 },
+          formatter: v => '-$' + (Math.abs(v)/1000000).toFixed(1) + 'M',
+          anchor: 'center', align: 'center',
+        }
+      },
+      {
+        label: 'Volumen ventas cruzadas (autos)',
+        data: ventasCruzadas,
+        type: 'line',
+        yAxisID: 'y2',
+        borderColor: C.azul,
+        pointBackgroundColor: C.azul,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 6,
+        pointHoverRadius: 9,
+        tension: 0.35,
+        fill: false,
+        order: 1,
+        datalabels: {
+          color: C.azul, font: { weight:'bold', size:12 },
+          formatter: v => v + ' autos',
+          anchor: 'end', align: 'top', offset: 6,
+        }
+      },
+    ]
+  },
+  options: {
+    ...dflt,
+    plugins: {
+      legend: { position:'top', labels:{ font:{ size:12 } } },
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            if (ctx.dataset.yAxisID === 'y2')
+              return ' ' + ctx.dataset.label + ': ' + ctx.parsed.y + ' autos';
+            const abs = Math.abs(ctx.parsed.y);
+            const sign = ctx.parsed.y < 0 ? '-$' : '+$';
+            return ' ' + ctx.dataset.label + ': ' + sign + abs.toLocaleString('es-CL');
+          },
+          afterBody: items => {
+            const idx = items[0].dataIndex;
+            return ['Balance neto: +$' + balanceMes[idx].toLocaleString('es-CL')];
+          }
+        }
+      },
+      datalabels: { display: true },
+    },
+    scales: {
+      x: { grid: { display:false } },
+      y: {
+        position: 'left',
+        ticks: {
+          callback: v => {
+            if (v === 0) return '$0';
+            if (v < 0) return '-$' + Math.abs(Math.round(v/1000000)) + 'M';
+            return '+$' + Math.round(v/1000000) + 'M';
+          }
+        },
+        grid: {
+          color: ctx => ctx.tick.value === 0 ? '#888' : '#e5e7eb',
+          lineWidth: ctx => ctx.tick.value === 0 ? 2 : 1,
+        }
+      },
+      y2: {
+        position: 'right',
+        beginAtZero: true,
+        grid: { drawOnChartArea: false },
+        ticks: { callback: v => v + ' autos', font:{ size:11 }, color: C.azul },
+        title: { display:true, text:'Autos vendidos', color: C.azul, font:{ size:11, weight:'600' } }
+      }
     }
   }
 });
