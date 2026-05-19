@@ -6,6 +6,7 @@
 <title>Dashboard Leads por Patente — Autos Usados Salazar-Israel</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root {
     --azul:    #1F3A6E;
@@ -165,6 +166,17 @@
   .sim-mismo-modelo{ background: #e8f5e2; border-color: #b8dfa8; }
   .sim-mismo-modelo .sim-pct { color: #3d7a1a; }
 
+  /* ── Botón descarga Excel ───────────────────────────────────── */
+  .btn-excel {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #217346; color: #fff;
+    border: none; border-radius: 8px; padding: 9px 18px;
+    font-size: .82rem; font-weight: 700; cursor: pointer;
+    margin-top: 14px; transition: background .15s;
+    text-decoration: none;
+  }
+  .btn-excel:hover { background: #1a5c38; }
+
   /* ── Footer ──────────────────────────────────────────────────── */
   footer {
     text-align: center; padding: 24px;
@@ -299,6 +311,9 @@
         </thead>
         <tbody id="tablaPatentes"></tbody>
       </table>
+      <button class="btn-excel" onclick="exportarTop10Excel()">
+        &#8681; Descargar tabla en Excel
+      </button>
     </div>
   </section>
 
@@ -834,8 +849,17 @@ new Chart(document.getElementById('chartOrigen'), {
   },
   options: {
     ...dflt, indexAxis:'y',
-    plugins: { legend:{display:false} },
-    scales: { x:{ beginAtZero:true }, y:{ grid:{display:false} } }
+    plugins: {
+      legend:{display:false},
+      datalabels: {
+        display: true,
+        anchor: 'end', align: 'end',
+        color: '#1a1a2e',
+        font: { weight:'bold', size:11 },
+        formatter: v => v,
+      }
+    },
+    scales: { x:{ beginAtZero:true, max: 70 }, y:{ grid:{display:false} } }
   }
 });
 
@@ -849,8 +873,17 @@ new Chart(document.getElementById('chartCompradas'), {
   },
   options: {
     ...dflt, indexAxis:'y',
-    plugins: { legend:{display:false} },
-    scales: { x:{ beginAtZero:true }, y:{ grid:{display:false} } }
+    plugins: {
+      legend:{display:false},
+      datalabels: {
+        display: true,
+        anchor: 'end', align: 'end',
+        color: '#1a1a2e',
+        font: { weight:'bold', size:11 },
+        formatter: v => v,
+      }
+    },
+    scales: { x:{ beginAtZero:true, max: 44 }, y:{ grid:{display:false} } }
   }
 });
 
@@ -1071,6 +1104,27 @@ new Chart(document.getElementById('chartRentabilidadMktpl'), {
     }
   }
 });
+
+// ── Exportar Top 10 a Excel ───────────────────────────────────────
+function exportarTop10Excel() {
+  const filas = topPat.map((r, i) => ({
+    "#":              i + 1,
+    "Patente":        r.pat,
+    "Marca":          r.marca,
+    "Modelo":         r.modelo,
+    "Año":            r.anio,
+    "Kilometraje":    r.km != null ? r.km : "No disponible",
+    "Leads Post-Reserva": r.leads,
+  }));
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(filas);
+  ws["!cols"] = [
+    { wch: 4 }, { wch: 10 }, { wch: 12 }, { wch: 18 },
+    { wch: 6 }, { wch: 14 }, { wch: 20 }
+  ];
+  XLSX.utils.book_append_sheet(wb, ws, "Top 10 Post-Reserva");
+  XLSX.writeFile(wb, "top10_patentes_post_reserva.xlsx");
+}
 </script>
 </body>
 </html>
