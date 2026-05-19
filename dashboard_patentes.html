@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Leads por Patente — Autos Usados Salazar-Israel</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+  :root {
+    --azul:    #1F3A6E;
+    --azul2:   #2E75B6;
+    --azul3:   #D6E4F0;
+    --naranja: #ED7D31;
+    --rojo:    #C00000;
+    --verde:   #70AD47;
+    --amarillo:#FFC000;
+    --gris:    #F4F6FA;
+    --texto:   #1a1a2e;
+    --borde:   #dde3ec;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--gris); color: var(--texto); }
+
+  /* ── Header ─────────────────────────────────────────────────── */
+  header {
+    background: linear-gradient(135deg, var(--azul) 0%, var(--azul2) 100%);
+    color: #fff; padding: 28px 40px 22px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  header .logo { font-size: 2rem; font-weight: 800; letter-spacing: -1px; }
+  header .sub  { font-size: .85rem; opacity: .8; margin-top: 4px; }
+  header .badge {
+    margin-left: auto; background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.3); border-radius: 20px;
+    padding: 6px 16px; font-size: .8rem;
+  }
+
+  /* ── Layout ─────────────────────────────────────────────────── */
+  main { max-width: 1400px; margin: 0 auto; padding: 30px 24px 60px; }
+  section { margin-bottom: 36px; }
+  h2 {
+    font-size: 1rem; font-weight: 700; color: var(--azul);
+    text-transform: uppercase; letter-spacing: .06em;
+    border-left: 4px solid var(--naranja); padding-left: 12px;
+    margin-bottom: 18px;
+  }
+
+  /* ── KPI Cards ───────────────────────────────────────────────── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .kpi {
+    background: #fff; border-radius: 12px;
+    border: 1px solid var(--borde); padding: 22px 20px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .kpi:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,.1); }
+  .kpi::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 4px; border-radius: 12px 12px 0 0;
+  }
+  .kpi.azul::before   { background: var(--azul2); }
+  .kpi.naranja::before{ background: var(--naranja); }
+  .kpi.rojo::before   { background: var(--rojo); }
+  .kpi.verde::before  { background: var(--verde); }
+  .kpi.amarillo::before{ background: var(--amarillo); }
+  .kpi.gris::before   { background: #8090a0; }
+  .kpi-icon { font-size: 1.5rem; margin-bottom: 10px; }
+  .kpi-label { font-size: .75rem; font-weight: 600; color: #6b7a90; text-transform: uppercase; letter-spacing: .05em; }
+  .kpi-value { font-size: 2.1rem; font-weight: 800; color: var(--texto); line-height: 1.1; margin: 6px 0 4px; }
+  .kpi-sub   { font-size: .8rem; color: #8090a0; }
+  .kpi-badge {
+    position: absolute; top: 14px; right: 14px;
+    font-size: .75rem; font-weight: 700;
+    padding: 3px 9px; border-radius: 20px;
+  }
+  .badge-rojo   { background: #fde8e8; color: var(--rojo); }
+  .badge-verde  { background: #e8f5e2; color: #3d7a1a; }
+  .badge-naranja{ background: #fef0e6; color: #a05000; }
+
+  /* ── Alerta insight ──────────────────────────────────────────── */
+  .insight-box {
+    background: linear-gradient(135deg, #fff8e6, #fff);
+    border: 1.5px solid var(--amarillo);
+    border-radius: 12px; padding: 18px 22px;
+    display: flex; gap: 14px; align-items: flex-start;
+    box-shadow: 0 2px 8px rgba(255,192,0,.15);
+    margin-bottom: 16px;
+  }
+  .insight-box .icon { font-size: 1.6rem; flex-shrink: 0; margin-top: 2px; }
+  .insight-box strong { color: var(--azul); }
+  .insight-box p { font-size: .9rem; line-height: 1.6; color: #444; }
+
+  /* ── Chart grid ──────────────────────────────────────────────── */
+  .chart-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .chart-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) {
+    .chart-grid-2, .chart-grid-3 { grid-template-columns: 1fr; }
+  }
+  .card {
+    background: #fff; border-radius: 12px;
+    border: 1px solid var(--borde); padding: 22px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  }
+  .card h3 {
+    font-size: .85rem; font-weight: 700; color: var(--azul);
+    margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em;
+  }
+  .card .card-sub { font-size: .75rem; color: #8090a0; margin-bottom: 16px; }
+  .chart-wrap { position: relative; }
+  .chart-wrap.tall   { height: 300px; }
+  .chart-wrap.medium { height: 260px; }
+  .chart-wrap.short  { height: 220px; }
+
+  /* ── Tabla patentes ──────────────────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+  thead th {
+    background: var(--azul); color: #fff;
+    padding: 10px 14px; text-align: left; font-weight: 600;
+    font-size: .75rem; text-transform: uppercase; letter-spacing: .04em;
+  }
+  tbody tr:nth-child(even) { background: var(--gris); }
+  tbody tr:hover { background: var(--azul3); }
+  tbody td { padding: 9px 14px; border-bottom: 1px solid var(--borde); }
+  .rank { font-weight: 700; color: var(--azul2); }
+  .bar-cell { display: flex; align-items: center; gap: 10px; }
+  .mini-bar { height: 8px; border-radius: 4px; background: var(--naranja); min-width: 4px; }
+
+  /* ── Similitud conversion ────────────────────────────────────── */
+  .sim-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 8px; }
+  .sim-card {
+    border-radius: 10px; padding: 18px 16px; text-align: center;
+    border: 1.5px solid var(--borde);
+  }
+  .sim-card .sim-pct { font-size: 2rem; font-weight: 800; margin-bottom: 4px; }
+  .sim-card .sim-n   { font-size: .8rem; color: #6b7a90; margin-bottom: 6px; }
+  .sim-card .sim-label{ font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  .sim-diferente { background: #fde8e8; border-color: #f5b8b8; }
+  .sim-diferente .sim-pct { color: var(--rojo); }
+  .sim-misma-marca { background: #fff8e6; border-color: #fde9a0; }
+  .sim-misma-marca .sim-pct { color: #b07000; }
+  .sim-mismo-modelo{ background: #e8f5e2; border-color: #b8dfa8; }
+  .sim-mismo-modelo .sim-pct { color: #3d7a1a; }
+
+  /* ── Footer ──────────────────────────────────────────────────── */
+  footer {
+    text-align: center; padding: 24px;
+    font-size: .78rem; color: #8090a0;
+    border-top: 1px solid var(--borde); background: #fff;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">Leads &amp; Patentes</div>
+    <div class="sub">Autos Usados · Salazar-Israel · Enero – Mayo 2026</div>
+  </div>
+  <div class="badge">Actualizado: 19/05/2026</div>
+</header>
+
+<main>
+
+  <!-- ── INSIGHTS ──────────────────────────────────────────────── -->
+  <section>
+    <div class="insight-box">
+      <div class="icon">⚠️</div>
+      <div>
+        <p><strong>Leads llegados a patentes ya reservadas:</strong> 12.499 leads (19,1% del total con patente) llegaron cuando el auto ya tenía reserva activa. Esto indica que las publicaciones no se dan de baja al momento de la reserva, generando un gasto de presupuesto digital sin posibilidad de venta directa.</p>
+      </div>
+    </div>
+    <div class="insight-box">
+      <div class="icon">✅</div>
+      <div>
+        <p><strong>Oportunidad de conversión cruzada:</strong> Se detectaron <strong>519 clientes</strong> que llegaron por una patente reservada y terminaron comprando otro auto del inventario. El <strong>82,5% compró una marca distinta</strong>, lo que muestra que el cliente es flexible si se le gestiona activamente con alternativas.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── KPIs ───────────────────────────────────────────────────── -->
+  <section>
+    <h2>Indicadores clave</h2>
+    <div class="kpi-grid">
+
+      <div class="kpi azul">
+        <div class="kpi-icon">📊</div>
+        <div class="kpi-label">Total Leads</div>
+        <div class="kpi-value">83.627</div>
+        <div class="kpi-sub">Ene – May 2026</div>
+      </div>
+
+      <div class="kpi azul">
+        <div class="kpi-icon">🔖</div>
+        <div class="kpi-label">Leads con Patente</div>
+        <div class="kpi-value">65.421</div>
+        <div class="kpi-sub">78,2% del total</div>
+      </div>
+
+      <div class="kpi gris">
+        <div class="kpi-icon">❓</div>
+        <div class="kpi-label">Leads sin Patente</div>
+        <div class="kpi-value">18.206</div>
+        <div class="kpi-sub">Interés genérico o marca/modelo</div>
+      </div>
+
+      <div class="kpi naranja">
+        <div class="kpi-icon">🚫</div>
+        <div class="kpi-label">Leads Post-Reserva</div>
+        <div class="kpi-value">12.499</div>
+        <div class="kpi-sub">Llegaron al auto ya reservado</div>
+        <span class="kpi-badge badge-rojo">19,1%</span>
+      </div>
+
+      <div class="kpi rojo">
+        <div class="kpi-icon">📌</div>
+        <div class="kpi-label">Patentes Afectadas</div>
+        <div class="kpi-value">2.934</div>
+        <div class="kpi-sub">Con reserva que siguieron atrayendo leads</div>
+      </div>
+
+      <div class="kpi amarillo">
+        <div class="kpi-icon">🏷️</div>
+        <div class="kpi-label">Patentes con Reserva</div>
+        <div class="kpi-value">7.104</div>
+        <div class="kpi-sub">En el período analizado</div>
+      </div>
+
+      <div class="kpi verde">
+        <div class="kpi-icon">♻️</div>
+        <div class="kpi-label">Conversión Cruzada</div>
+        <div class="kpi-value">519</div>
+        <div class="kpi-sub">Leads recuperados en otra patente</div>
+        <span class="kpi-badge badge-verde">4,2%</span>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="chart-grid-2">
+      <div class="card">
+        <h3>Distribución de leads con patente</h3>
+        <div class="card-sub">Estado del lead respecto a la reserva de la patente</div>
+        <div class="chart-wrap medium">
+          <canvas id="chartDistribucion"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Top 10 marcas con más leads</h3>
+        <div class="card-sub">Total enero – mayo 2026</div>
+        <div class="chart-wrap medium">
+          <canvas id="chartMarcas"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TOP PATENTES POST-RESERVA ─────────────────────────────── -->
+  <section>
+    <h2>Patentes reservadas con más leads posteriores</h2>
+    <div class="card">
+      <h3>Top 10 — Leads recibidos después de la fecha de reserva</h3>
+      <div class="card-sub">Estas patentes siguieron publicadas y atrayendo tráfico sin disponibilidad de venta</div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Patente</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Leads Post-Reserva</th>
+          </tr>
+        </thead>
+        <tbody id="tablaPatentes"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── TOP MODELOS ────────────────────────────────────────────── -->
+  <section>
+    <h2>Modelos más buscados</h2>
+    <div class="card">
+      <h3>Top 10 modelos por volumen de leads</h3>
+      <div class="card-sub">Independiente de si la patente estaba reservada o no</div>
+      <div class="chart-wrap tall">
+        <canvas id="chartModelos"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CONVERSIÓN CRUZADA ─────────────────────────────────────── -->
+  <section>
+    <h2>Análisis de conversión cruzada</h2>
+    <div class="card" style="margin-bottom:20px;">
+      <h3>¿Qué compró el cliente que llegó por una patente ya reservada?</h3>
+      <div class="card-sub">Clasificación de los 519 casos donde el cliente terminó comprando otro auto</div>
+      <div class="sim-grid">
+        <div class="sim-card sim-diferente">
+          <div class="sim-pct">82,5%</div>
+          <div class="sim-n">428 casos</div>
+          <div class="sim-label">🔴 Marca diferente</div>
+        </div>
+        <div class="sim-card sim-misma-marca">
+          <div class="sim-pct">7,9%</div>
+          <div class="sim-n">41 casos</div>
+          <div class="sim-label">🟡 Misma marca</div>
+        </div>
+        <div class="sim-card sim-mismo-modelo">
+          <div class="sim-pct">9,6%</div>
+          <div class="sim-n">50 casos</div>
+          <div class="sim-label">🟢 Mismo modelo</div>
+        </div>
+      </div>
+      <p style="font-size:.8rem;color:#6b7a90;margin-top:14px;">
+        💡 <strong>Lectura clave:</strong> el 82,5% de los clientes recuperados compró un auto de marca diferente a la que originalmente buscó. Esto sugiere que el precio y disponibilidad son más determinantes que la lealtad a la marca en este segmento.
+      </p>
+    </div>
+    <div class="chart-grid-2">
+      <div class="card">
+        <h3>Marcas de origen (lead buscaba)</h3>
+        <div class="card-sub">Marca del auto reservado por el que llegó el lead</div>
+        <div class="chart-wrap medium">
+          <canvas id="chartOrigen"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Marcas efectivamente compradas</h3>
+        <div class="card-sub">Marca del auto que terminó adquiriendo el cliente</div>
+        <div class="chart-wrap medium">
+          <canvas id="chartCompradas"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ANÁLISIS DE COSTO POR CANAL ──────────────────────────── -->
+  <section>
+    <h2>Impacto económico — Costo por canal en leads post-reserva</h2>
+
+    <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); margin-bottom:20px;">
+      <div class="kpi rojo">
+        <div class="kpi-icon">💸</div>
+        <div class="kpi-label">Costo Total 5 meses</div>
+        <div class="kpi-value" style="font-size:1.6rem;">$46.091.124</div>
+        <div class="kpi-sub">Leads post-reserva (ambos canales)</div>
+      </div>
+      <div class="kpi naranja">
+        <div class="kpi-icon">🏪</div>
+        <div class="kpi-label">Costo Marketplace</div>
+        <div class="kpi-value" style="font-size:1.6rem;">$20.534.124</div>
+        <div class="kpi-sub">4.602 leads × $4.462 c/IVA</div>
+      </div>
+      <div class="kpi azul">
+        <div class="kpi-icon">🌐</div>
+        <div class="kpi-label">Costo Web Propio</div>
+        <div class="kpi-value" style="font-size:1.6rem;">$25.557.000</div>
+        <div class="kpi-sub">7.302 leads × $3.500</div>
+      </div>
+      <div class="kpi amarillo">
+        <div class="kpi-icon">📅</div>
+        <div class="kpi-label">Gasto mensual promedio</div>
+        <div class="kpi-value" style="font-size:1.6rem;">$9.218.225</div>
+        <div class="kpi-sub">Promedio de 5 meses</div>
+      </div>
+      <div class="kpi rojo">
+        <div class="kpi-icon">🎯</div>
+        <div class="kpi-label">Costo/Venta Cruzada Marketplace</div>
+        <div class="kpi-value" style="font-size:1.6rem;">$82.136</div>
+        <div class="kpi-sub">Por cada venta recuperada desde mktpl</div>
+      </div>
+      <div class="kpi verde">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-label">Ahorro anual si se baja mktpl</div>
+        <div class="kpi-value" style="font-size:1.6rem;">$49.281.898</div>
+        <div class="kpi-sub">Proyectado si se elimina post-reserva en mktpl</div>
+      </div>
+    </div>
+
+    <div class="chart-grid-2" style="margin-bottom:20px;">
+      <div class="card">
+        <h3>Distribución de leads post-reserva por canal</h3>
+        <div class="card-sub">De los 12.499 leads llegados a patentes ya reservadas · CPL Web Propio $3.500 · CPL Marketplace $4.462 c/IVA</div>
+        <div class="chart-wrap medium">
+          <canvas id="chartCanalPost"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Costo mensual por canal (CLP)</h3>
+        <div class="card-sub">Evolución del gasto en leads post-reserva por mes</div>
+        <div class="chart-wrap medium">
+          <canvas id="chartCostoMensual"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <h3>Tabla de costo por canal</h3>
+      <div class="card-sub">Resumen económico de leads post-reserva · Ene–May 2026</div>
+      <table style="margin-top:12px;">
+        <thead>
+          <tr>
+            <th>Canal</th><th>Leads Post-Res.</th><th>CPL</th>
+            <th>Costo Total (CLP)</th><th>Conv. Cruzada (est.)</th>
+            <th>Costo por Venta Cruzada</th><th>Recomendación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#fde8e8;">
+            <td><strong>Marketplace (Chileautos)</strong></td>
+            <td><strong>4.602</strong></td><td>$4.462 c/IVA</td>
+            <td><strong style="color:var(--rojo);">$20.534.124</strong></td>
+            <td>~250</td><td><strong style="color:var(--rojo);">$82.136</strong></td>
+            <td style="color:var(--rojo); font-weight:700;">⛔ Baja al reservar</td>
+          </tr>
+          <tr style="background:#e8f5e2;">
+            <td><strong>Sitio Web Propio</strong></td>
+            <td><strong>7.302</strong></td><td>$3.500</td>
+            <td><strong style="color:#3d7a1a;">$25.557.000</strong></td>
+            <td>~397</td><td><strong style="color:#3d7a1a;">$64.375</strong></td>
+            <td style="color:#b07000; font-weight:700;">⚠️ Redirigir a similares</td>
+          </tr>
+          <tr>
+            <td>Otros canales</td><td>595</td><td>—</td><td>—</td><td>~32</td><td>—</td>
+            <td>Gestión manual</td>
+          </tr>
+          <tr style="background:#1F3A6E; color:#fff;">
+            <td><strong>TOTAL</strong></td>
+            <td><strong>12.499</strong></td><td>—</td>
+            <td><strong>$46.091.124</strong></td>
+            <td><strong>679</strong></td>
+            <td><strong>$67.880</strong></td><td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── CONTEXTO DE CONVERSIÓN POR ORIGEN ─────────────────────── -->
+  <section>
+    <h2>Contexto: tasa de cierre real por origen de lead</h2>
+
+    <div class="insight-box">
+      <div class="icon">📈</div>
+      <div>
+        <p>
+          <strong>Lectura clave de las tasas de cierre:</strong> los leads post-reserva convierten al <strong>5,4% en venta cruzada</strong>.
+          Comparado con las tasas de cierre normales por origen (2,4–5,3% en el período Jan–May 2026),
+          esta conversión cruzada está <strong>por encima del canal de menor conversión y dentro del rango del de mayor conversión</strong>.
+          Esto confirma que el lead no se "pierde" si se gestiona activamente — el problema es el costo de capturarlo cuando el auto ya no está disponible.
+        </p>
+      </div>
+    </div>
+
+    <div class="chart-grid-2" style="margin-bottom:20px;">
+      <div class="card">
+        <h3>Tasa de cierre — Canal de menor conversión</h3>
+        <div class="card-sub">Sitio Web Propio · Tasa cierre digital asignado vs AmeriCar · May 2025 – May 2026</div>
+        <div class="chart-wrap tall">
+          <canvas id="chartCierrePropio"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Tasa de cierre — Canal de mayor conversión</h3>
+        <div class="card-sub">Marketplace · Tasa cierre digital asignado vs AmeriCar · May 2025 – May 2026</div>
+        <div class="chart-wrap tall">
+          <canvas id="chartCierreMktpl"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Comparación: conversión post-reserva vs. conversión normal por canal</h3>
+      <div class="card-sub">¿En qué contexto está el 5,4% de conversión cruzada?</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-top:16px;">
+        <div style="text-align:center; padding:20px; background:#f0f4ff; border-radius:10px; border:2px solid var(--azul2);">
+          <div style="font-size:2rem; font-weight:800; color:var(--azul2);">~2,4%</div>
+          <div style="font-size:.8rem; font-weight:700; color:#6b7a90; margin:6px 0;">Cierre Web Propio</div>
+          <div style="font-size:.78rem; color:#444;">Promedio Ene–May 2026<br>Leads normales del canal</div>
+        </div>
+        <div style="text-align:center; padding:20px; background:#fff8e6; border-radius:10px; border:2px solid var(--amarillo);">
+          <div style="font-size:2rem; font-weight:800; color:var(--naranja);">~4,3%</div>
+          <div style="font-size:.8rem; font-weight:700; color:#6b7a90; margin:6px 0;">Cierre Marketplace</div>
+          <div style="font-size:.78rem; color:#444;">Promedio Ene–May 2026<br>Leads normales del canal</div>
+        </div>
+        <div style="text-align:center; padding:20px; background:#e8f5e2; border-radius:10px; border:2px solid var(--verde);">
+          <div style="font-size:2rem; font-weight:800; color:var(--verde);">5,4%</div>
+          <div style="font-size:.8rem; font-weight:700; color:#6b7a90; margin:6px 0;">Conversión Cruzada</div>
+          <div style="font-size:.78rem; color:#444;">Leads post-reserva<br>que compraron otra patente</div>
+        </div>
+      </div>
+      <div style="background:#f0f4ff; border-radius:10px; padding:14px; margin-top:16px; border-left:4px solid var(--azul2);">
+        <p style="font-size:.85rem; line-height:1.6; color:#333;">
+          <strong>Conclusión:</strong> el lead post-reserva bien gestionado convierte <strong>mejor que el canal de web propio normal (2,4%)</strong>
+          y similar al marketplace (4,3%). Esto justifica no "apagar" sino <strong>optimizar la gestión</strong>:
+          el cliente tiene intención real de compra, pero llega a un auto que ya no está disponible.
+          Con una propuesta de alternativas activa, ese 5,4% tiene potencial de subir.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PROPUESTAS ESTRATÉGICAS ────────────────────────────────── -->
+  <section>
+    <h2>Propuestas estratégicas — Cómo aprovechar la tracción de unidades reservadas</h2>
+
+    <div class="insight-box" style="border-color:var(--azul2);">
+      <div class="icon">🚀</div>
+      <div>
+        <p>
+          <strong>El objetivo no es apagar — es optimizar.</strong> Las unidades reservadas con alta tracción son activos de marketing.
+          El desafío es convertir esa demanda en ventas de otras unidades disponibles, reduciendo el costo del proceso.
+        </p>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+
+      <div class="card" style="border-top:4px solid var(--verde);">
+        <h3 style="color:#3d7a1a;">PROPUESTA 1 — Página de "unidad reservada" con alternativas activas</h3>
+        <div class="card-sub">Acción: UX / Desarrollo web · Responsable: Marketing Digital</div>
+        <p style="font-size:.85rem; line-height:1.7; color:#333; margin-top:10px;">
+          En sitio web propio, cuando la unidad esté reservada, mostrar un banner claro
+          <em>"Este auto ya fue apartado"</em> y debajo un carrusel con 3–5 unidades
+          disponibles del mismo segmento/precio.<br><br>
+          <strong>Costo adicional:</strong> $0 (tráfico ya existe)<br>
+          <strong>Potencial:</strong> si la conversión cruzada sube de 5,4% a 8%, son ~240 ventas adicionales/5 meses<br>
+          <strong>Impacto en CX:</strong> muy positivo — el cliente recibe una solución, no un rechazo
+        </p>
+      </div>
+
+      <div class="card" style="border-top:4px solid var(--amarillo);">
+        <h3 style="color:#8a6000;">PROPUESTA 2 — Lista de espera para modelos de alta tracción</h3>
+        <div class="card-sub">Acción: Proceso comercial · Responsable: Jefatura de Ventas Usados</div>
+        <p style="font-size:.85rem; line-height:1.7; color:#333; margin-top:10px;">
+          Unidades como <strong>Suzuki Swift (282 leads post-reserva)</strong> o
+          <strong>Kia Rio 5 (222 leads)</strong> demuestran demanda sostenida de modelo.<br><br>
+          Propuesta: cuando un ejecutivo recibe un lead post-reserva de estos modelos, ofrece
+          al cliente entrar en una lista de espera. Al ingresar la próxima unidad del mismo modelo,
+          el cliente ya está pre-calificado y activo.<br><br>
+          <strong>Resultado esperado:</strong> reducir el tiempo de venta de unidades del mismo modelo cuando ingresan al inventario.
+        </p>
+      </div>
+
+      <div class="card" style="border-top:4px solid var(--azul2);">
+        <h3 style="color:var(--azul);">PROPUESTA 3 — Reasignar presupuesto mktpl a unidades sin tracción</h3>
+        <div class="card-sub">Acción: Pauta digital · Responsable: Marketing</div>
+        <p style="font-size:.85rem; line-height:1.7; color:#333; margin-top:10px;">
+          Con el ahorro de <strong>~$4.106.825/mes</strong> al no pagar leads de unidades reservadas en marketplace,
+          invertir en publicar o pautar unidades con <strong>menos de 10 leads en el período</strong>
+          y más de 30 días en inventario.<br><br>
+          Criterio de selección: unidades con precio competitivo pero baja visibilidad orgánica.<br><br>
+          <strong>Resultado esperado:</strong> mayor rotación de stock estático sin aumentar presupuesto total de pauta.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <h3>Resumen de propuestas — Matriz de impacto vs. esfuerzo</h3>
+      <div class="card-sub">Para priorización con gerencia y marketing</div>
+      <table style="margin-top:12px;">
+        <thead>
+          <tr><th>#</th><th>Propuesta</th><th>Esfuerzo</th><th>Impacto económico</th><th>Impacto CX</th><th>Prioridad</th></tr>
+        </thead>
+        <tbody>
+          <tr style="background:#e8f5e2;">
+            <td>1</td><td>Página "unidad reservada" con alternativas</td>
+            <td>Medio (desarrollo web)</td>
+            <td style="color:var(--verde); font-weight:700;">+ventas cruzadas</td>
+            <td style="color:var(--verde);">Muy positivo</td>
+            <td style="font-weight:700; color:var(--naranja);">🟠 Alta</td>
+          </tr>
+          <tr style="background:#fffff2;">
+            <td>2</td><td>Lista de espera para modelos de alta tracción</td>
+            <td>Bajo (proceso comercial)</td>
+            <td style="color:var(--amarillo); font-weight:700;">Rotación más rápida</td>
+            <td style="color:var(--verde);">Positivo</td>
+            <td style="font-weight:700; color:var(--amarillo);">🟡 Media</td>
+          </tr>
+          <tr style="background:#f0f4ff;">
+            <td>3</td><td>Reasignar presupuesto a unidades sin tracción</td>
+            <td>Bajo (ajuste de pauta)</td>
+            <td style="color:var(--verde); font-weight:700;">~$4M/mes reasignado</td>
+            <td>Neutro</td>
+            <td style="font-weight:700; color:var(--azul2);">🔵 Media-Alta</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Análisis de Leads por Patente · Autos Usados Salazar-Israel · Enero – Mayo 2026 · Datos extraídos del CRM
+</footer>
+
+<script>
+// ── Paleta de colores ─────────────────────────────────────────────
+const C = {
+  azul:    '#1F3A6E', azul2: '#2E75B6', azul3: '#7BAFD4',
+  naranja: '#ED7D31', rojo:  '#C00000', verde: '#70AD47',
+  amarillo:'#FFC000', gris:  '#8090A0',
+  serie:   ['#2E75B6','#ED7D31','#70AD47','#FFC000','#C00000',
+            '#7BAFD4','#F4A460','#3d7a1a','#8090A0','#1F3A6E'],
+};
+const dflt = { responsive:true, maintainAspectRatio:false, plugins:{ legend:{labels:{font:{size:12}}} } };
+
+// Registrar datalabels y apagar globalmente — solo se activa donde se configure explícitamente
+Chart.register(ChartDataLabels);
+Chart.defaults.plugins.datalabels.display = false;
+
+// ── 1. Mensual ────────────────────────────────────────────────────
+new Chart(document.getElementById('chartMensual'), {
+  type: 'bar',
+  data: {
+    labels: ['Enero','Febrero','Marzo','Abril','Mayo'],
+    datasets: [
+      { label:'Antes de reserva',   data:[8025,10343,8859,6791,1934], backgroundColor: C.azul2,   borderRadius:4 },
+      { label:'Después de reserva', data:[2838, 3793,2190,1860,1818], backgroundColor: C.naranja, borderRadius:4 },
+    ]
+  },
+  options: {
+    ...dflt,
+    plugins: { legend:{ position:'top' }, tooltip:{ callbacks:{ label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('es-CL')} leads` } } },
+    scales: {
+      x: { grid:{display:false} },
+      y: { beginAtZero:true, ticks:{ callback: v => v.toLocaleString('es-CL') } }
+    }
+  }
+});
+
+// ── 2. Distribución ───────────────────────────────────────────────
+new Chart(document.getElementById('chartDistribucion'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Antes de reserva','Después de reserva','Sin reserva (patente libre)'],
+    datasets: [{ data:[35952,12499,16970], backgroundColor:[C.azul2,C.naranja,C.gris], borderWidth:2, hoverOffset:6 }]
+  },
+  options: {
+    ...dflt,
+    cutout: '58%',
+    plugins: {
+      legend: { position:'bottom', labels:{font:{size:11}} },
+      tooltip: { callbacks:{ label: ctx => ` ${ctx.label}: ${ctx.parsed.toLocaleString('es-CL')}` } },
+      datalabels: {
+        color: '#fff',
+        font: { weight:'bold', size:12 },
+        formatter: (value, ctx) => {
+          const total = ctx.dataset.data.reduce((a,b) => a+b, 0);
+          const pct = ((value / total) * 100).toFixed(1);
+          return value.toLocaleString('es-CL') + '\n' + pct + '%';
+        },
+        textAlign: 'center',
+        display: ctx => ctx.dataset.data[ctx.dataIndex] > 2000,
+      }
+    }
+  }
+});
+
+// ── 3. Marcas ─────────────────────────────────────────────────────
+new Chart(document.getElementById('chartMarcas'), {
+  type: 'bar',
+  data: {
+    labels: ['Chevrolet','Kia','Suzuki','Toyota','Peugeot','MG','Hyundai','Ford','Nissan','Chery'],
+    datasets: [{ label:'Leads', data:[9549,6095,5417,5275,5078,4978,4860,4200,3746,3323],
+      backgroundColor: C.serie, borderRadius:4 }]
+  },
+  options: {
+    ...dflt, indexAxis:'y',
+    plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: ctx => ` ${ctx.parsed.x.toLocaleString('es-CL')} leads` } } },
+    scales: { x:{ beginAtZero:true, ticks:{ callback: v => v.toLocaleString('es-CL') } }, y:{ grid:{display:false} } }
+  }
+});
+
+// ── 4. Tabla patentes ─────────────────────────────────────────────
+const topPat = [
+  { pat:'HFYS87', marca:'Suzuki',  modelo:'Swift',          leads:282 },
+  { pat:'KBYW46', marca:'Kia',     modelo:'Rio 5',          leads:222 },
+  { pat:'JTKC50', marca:'Suzuki',  modelo:'Alto',           leads:175 },
+  { pat:'RRTX66', marca:'Renault', modelo:'Kwid',           leads:110 },
+  { pat:'JXPV17', marca:'Hyundai', modelo:'Grand I10',      leads:104 },
+  { pat:'PTCB60', marca:'Peugeot', modelo:'208 Style',      leads: 85 },
+  { pat:'SBSB20', marca:'Gac',     modelo:'Gs4 Power',      leads: 70 },
+  { pat:'HHVF53', marca:'Toyota',  modelo:'4Runner',        leads: 69 },
+  { pat:'LLJL56', marca:'Subaru',  modelo:'Impreza Sedan',  leads: 68 },
+  { pat:'JRWD41', marca:'Peugeot', modelo:'3008',           leads: 68 },
+];
+const maxLeads = topPat[0].leads;
+const tbody = document.getElementById('tablaPatentes');
+topPat.forEach((r, i) => {
+  const pct = Math.round(r.leads / maxLeads * 100);
+  tbody.innerHTML += `<tr>
+    <td class="rank">${i+1}</td>
+    <td><strong>${r.pat}</strong></td>
+    <td>${r.marca}</td>
+    <td>${r.modelo}</td>
+    <td>
+      <div class="bar-cell">
+        <div class="mini-bar" style="width:${pct}px;max-width:120px;"></div>
+        <strong>${r.leads.toLocaleString('es-CL')}</strong>
+      </div>
+    </td>
+  </tr>`;
+});
+
+// ── 5. Top modelos ────────────────────────────────────────────────
+new Chart(document.getElementById('chartModelos'), {
+  type: 'bar',
+  data: {
+    labels: ['Chevrolet Sail','MG ZS','Suzuki Swift','MG 3','Kia Morning','Chevrolet Tracker','Peugeot 3008','Mitsubishi L200','Chery Tiggo 2','Toyota RAV4'],
+    datasets: [{ label:'Leads', data:[2392,1506,1305,1235,1167,1130,1089,1087,1010,939],
+      backgroundColor: C.serie, borderRadius:4 }]
+  },
+  options: {
+    ...dflt, indexAxis:'y',
+    plugins: {
+      legend:{display:false},
+      tooltip:{ callbacks:{ label: ctx => ` ${ctx.parsed.x.toLocaleString('es-CL')} leads` } },
+      datalabels: {
+        anchor: 'end', align: 'end',
+        color: '#1a1a2e',
+        font: { weight:'bold', size:11 },
+        formatter: v => v.toLocaleString('es-CL'),
+      }
+    },
+    scales: {
+      x:{ beginAtZero:true, ticks:{ callback: v => v.toLocaleString('es-CL') }, max: 2700 },
+      y:{ grid:{display:false} }
+    }
+  }
+});
+
+// ── 6. Marcas origen (lead) ───────────────────────────────────────
+new Chart(document.getElementById('chartOrigen'), {
+  type: 'bar',
+  data: {
+    labels: ['Hyundai','Chevrolet','Kia','Peugeot','Ford','MG','Toyota','Changan'],
+    datasets: [{ label:'Leads origen', data:[59,36,34,32,31,29,28,28],
+      backgroundColor: C.azul2, borderRadius:4 }]
+  },
+  options: {
+    ...dflt, indexAxis:'y',
+    plugins: { legend:{display:false} },
+    scales: { x:{ beginAtZero:true }, y:{ grid:{display:false} } }
+  }
+});
+
+// ── 7. Marcas compradas ───────────────────────────────────────────
+new Chart(document.getElementById('chartCompradas'), {
+  type: 'bar',
+  data: {
+    labels: ['Hyundai','Chevrolet','Toyota','Suzuki','Kia','Chery','MG'],
+    datasets: [{ label:'Autos comprados', data:[37,35,31,30,29,25,25],
+      backgroundColor: C.verde, borderRadius:4 }]
+  },
+  options: {
+    ...dflt, indexAxis:'y',
+    plugins: { legend:{display:false} },
+    scales: { x:{ beginAtZero:true }, y:{ grid:{display:false} } }
+  }
+});
+
+// ── 8. Canal post-reserva (donut) ─────────────────────────────────
+new Chart(document.getElementById('chartCanalPost'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Sitio Web Propio','Marketplace','Otros'],
+    datasets: [{
+      data: [7302, 4602, 595],
+      backgroundColor: [C.azul2, C.rojo, C.gris],
+      borderWidth: 2, hoverOffset: 6
+    }]
+  },
+  options: {
+    ...dflt, cutout:'58%',
+    plugins: {
+      legend: { position:'bottom', labels:{ font:{ size:11 } } },
+      tooltip: { callbacks:{ label: ctx => {
+        const pct = ((ctx.parsed / 12499) * 100).toFixed(1);
+        return ` ${ctx.label}: ${ctx.parsed.toLocaleString('es-CL')} leads (${pct}%)`;
+      }}},
+      datalabels: {
+        color: '#fff',
+        font: { weight:'bold', size: 12 },
+        formatter: (value, ctx) => {
+          const pct = ((value / 12499) * 100).toFixed(1);
+          return `${value.toLocaleString('es-CL')}\n${pct}%`;
+        },
+        textAlign: 'center',
+        display: ctx => ctx.dataset.data[ctx.dataIndex] > 400,
+      }
+    }
+  }
+});
+
+// ── 9. Costo mensual por canal ─────────────────────────────────────
+new Chart(document.getElementById('chartCostoMensual'), {
+  type: 'bar',
+  data: {
+    labels: ['Enero','Febrero','Marzo','Abril','Mayo'],
+    datasets: [
+      { label:'Costo Web Propio',  data:[5838500,7754750,4487000,3804000,3672750], backgroundColor: C.azul2, borderRadius:0 },
+      { label:'Costo Marketplace', data:[4476564,5789070,3352572,2790252,2768174], backgroundColor: C.rojo,  borderRadius:4 },
+    ]
+  },
+  options: {
+    ...dflt,
+    plugins: {
+      legend:{ position:'top' },
+      tooltip:{ callbacks:{ label: ctx => ` ${ctx.dataset.label}: $${ctx.parsed.y.toLocaleString('es-CL')}` } },
+      datalabels: {
+        color: '#fff',
+        font: { weight:'bold', size: 11 },
+        formatter: v => '$' + (v/1000000).toFixed(1) + 'M',
+        anchor: 'center',
+        align: 'center',
+        display: ctx => ctx.dataset.data[ctx.dataIndex] > 1500000,
+      }
+    },
+    scales: {
+      x:{ stacked:true, grid:{display:false} },
+      y:{ stacked:true, beginAtZero:true, ticks:{ callback: v => '$'+Math.round(v/1000000)+'M' } }
+    }
+  }
+});
+
+// ── 10. Tasa de cierre Web Propio ──────────────────────────────────
+const mesesCierre = ['May-25','Jun-25','Jul-25','Ago-25','Sep-25','Oct-25','Nov-25','Dic-25','Ene-26','Feb-26','Mar-26','Abr-26','May-26'];
+new Chart(document.getElementById('chartCierrePropio'), {
+  type: 'line',
+  data: {
+    labels: mesesCierre,
+    datasets: [
+      { label:'Cierre digital asignado', data:[2.2,1.7,0.9,1.3,2.3,2.2,2.4,2.5,2.5,1.6,3.0,2.8,2.4],
+        borderColor: C.azul2, backgroundColor: C.azul2+'33', tension:.4, pointRadius:4, pointHoverRadius:6, fill:true },
+      { label:'Conversión cruzada post-reserva', data:[null,null,null,null,null,null,null,null,5.4,5.4,5.4,5.4,5.4],
+        borderColor: C.verde, borderDash:[6,4], tension:0, pointRadius:3, fill:false }
+    ]
+  },
+  options: {
+    ...dflt,
+    plugins: { legend:{ position:'bottom', labels:{ font:{ size:10 } } },
+      tooltip:{ callbacks:{ label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}%` } } },
+    scales: {
+      x:{ grid:{display:false}, ticks:{ font:{size:9} } },
+      y:{ beginAtZero:true, ticks:{ callback: v => v+'%' }, max:8 }
+    }
+  }
+});
+
+// ── 11. Tasa de cierre Marketplace ─────────────────────────────────
+new Chart(document.getElementById('chartCierreMktpl'), {
+  type: 'line',
+  data: {
+    labels: mesesCierre,
+    datasets: [
+      { label:'Cierre digital asignado', data:[6.2,5.4,2.0,2.7,3.9,4.5,4.4,3.8,4.3,4.7,4.4,5.3,3.1],
+        borderColor: C.azul2, backgroundColor: C.azul2+'33', tension:.4, pointRadius:4, pointHoverRadius:6, fill:true },
+      { label:'Conversión cruzada post-reserva', data:[null,null,null,null,null,null,null,null,5.4,5.4,5.4,5.4,5.4],
+        borderColor: C.verde, borderDash:[6,4], tension:0, pointRadius:3, fill:false }
+    ]
+  },
+  options: {
+    ...dflt,
+    plugins: { legend:{ position:'bottom', labels:{ font:{ size:10 } } },
+      tooltip:{ callbacks:{ label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}%` } } },
+    scales: {
+      x:{ grid:{display:false}, ticks:{ font:{size:9} } },
+      y:{ beginAtZero:true, ticks:{ callback: v => v+'%' }, max:10 }
+    }
+  }
+});
+</script>
+</body>
+</html>
