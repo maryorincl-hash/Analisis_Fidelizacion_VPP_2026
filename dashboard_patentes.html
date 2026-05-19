@@ -60,7 +60,7 @@
     .kpi-grid { grid-template-columns: repeat(2, 1fr); }
   }
   .kpi-featured {
-    grid-column: span 2;
+    grid-column: span 1;
     background: linear-gradient(135deg, #c00000 0%, #e53030 100%) !important;
     border-color: #c00000 !important;
     color: #fff;
@@ -68,9 +68,9 @@
   .kpi-featured::before { background: #fff !important; opacity: .25; height: 5px; }
   .kpi-featured .kpi-label { color: rgba(255,255,255,.8) !important; }
   .kpi-featured .kpi-sub   { color: rgba(255,255,255,.7) !important; }
-  .kpi-featured .kpi-value { color: #fff !important; font-size: 2.8rem !important; }
-  .kpi-featured .kpi-icon  { font-size: 2rem; }
-  .kpi-featured .kpi-badge { background: rgba(255,255,255,.2) !important; color: #fff !important; font-size: .85rem; }
+  .kpi-featured .kpi-value { color: #fff !important; font-size: 2.1rem !important; }
+  .kpi-featured .kpi-icon  { font-size: 1.5rem; }
+  .kpi-featured .kpi-badge { background: rgba(255,255,255,.2) !important; color: #fff !important; font-size: .75rem; }
   .kpi {
     background: #fff; border-radius: 12px;
     border: 1px solid var(--borde); padding: 22px 20px;
@@ -541,9 +541,9 @@
       <div class="icon">📈</div>
       <div>
         <p>
-          <strong>Lectura clave de las tasas de cierre:</strong> los leads post-reserva convierten al <strong>2,6% en venta cruzada</strong> (facturación confirmada en CRM).
+          <strong>Lectura clave de las tasas de cierre:</strong> los leads post-reserva convierten al <strong>2,6% en venta cruzada real</strong> (facturación confirmada) y al <strong>4,2% en potencial</strong> (clientes que reservaron otra patente y podrían aún facturar).
           Comparado con las tasas de cierre normales por origen (1,6–5,3% en el período Ene–May 2026),
-          esta conversión cruzada está <strong>al nivel del marketplace (~2,6%) y con margen para acercarse al sitio web propio (~4,4%)</strong>.
+          la conversión real está <strong>al nivel del marketplace (~2,6%)</strong>, y el potencial <strong>se acerca al cierre del sitio web propio (~4,4%)</strong>.
           Esto confirma que el lead no se "pierde" si se gestiona activamente — el problema es el costo de capturarlo cuando el auto ya no está disponible.
         </p>
       </div>
@@ -568,8 +568,8 @@
 
     <div class="card">
       <h3>Comparación: conversión post-reserva vs. conversión normal por canal</h3>
-      <div class="card-sub">¿En qué contexto está el 2,6% de conversión cruzada?</div>
-      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-top:16px;">
+      <div class="card-sub">Conversión real (facturada) vs. potencial (con reserva) vs. tasas de cierre por canal · Ene–May 2026</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px; margin-top:16px;">
         <div style="text-align:center; padding:20px; background:#f0f4ff; border-radius:10px; border:2px solid var(--azul2);">
           <div style="font-size:2rem; font-weight:800; color:var(--azul2);">~4,4%</div>
           <div style="font-size:.8rem; font-weight:700; color:#6b7a90; margin:6px 0;">Cierre Web Propio</div>
@@ -582,16 +582,19 @@
         </div>
         <div style="text-align:center; padding:20px; background:#e8f5e2; border-radius:10px; border:2px solid var(--verde);">
           <div style="font-size:2rem; font-weight:800; color:var(--verde);">2,6%</div>
-          <div style="font-size:.8rem; font-weight:700; color:#6b7a90; margin:6px 0;">Conversión Cruzada</div>
-          <div style="font-size:.78rem; color:#444;">Leads post-reserva<br>que compraron otra patente</div>
+          <div style="font-size:.8rem; font-weight:700; color:#6b7a90; margin:6px 0;">Conv. Cruzada Real</div>
+          <div style="font-size:.78rem; color:#444;">320 clientes facturados<br>en otra patente</div>
+        </div>
+        <div style="text-align:center; padding:20px; background:#f0f8ff; border-radius:10px; border:2px dashed var(--azul2);">
+          <div style="font-size:2rem; font-weight:800; color:var(--azul2);">4,2%</div>
+          <div style="font-size:.8rem; font-weight:700; color:#6b7a90; margin:6px 0;">Conv. Cruzada Potencial</div>
+          <div style="font-size:.78rem; color:#444;">519 con reserva activa<br>en otra patente</div>
         </div>
       </div>
       <div style="background:#f0f4ff; border-radius:10px; padding:14px; margin-top:16px; border-left:4px solid var(--azul2);">
         <p style="font-size:.85rem; line-height:1.6; color:#333;">
-          <strong>Conclusión:</strong> el lead post-reserva bien gestionado convierte <strong>al mismo nivel que el marketplace normal (~2,6%)</strong>
-          y tiene margen real para acercarse al sitio web propio (~4,4%) con gestión activa. Esto justifica no "apagar" sino <strong>optimizar la gestión</strong>:
+          <strong>Conclusión:</strong> la conversión cruzada <strong>real (2,6% — 320 ventas facturadas)</strong> ya iguala al marketplace, y el <strong>potencial (4,2% — 519 con reserva activa)</strong> se acerca al cierre del sitio web propio (~4,4%). La brecha entre ambas tasas son 199 clientes que reservaron otra patente y aún no han facturado — ahí está la oportunidad concreta. Esto justifica no "apagar" sino <strong>optimizar la gestión</strong>:
           el cliente tiene intención real de compra, pero llega a un auto que ya no está disponible.
-          Con una propuesta de alternativas activa, ese 2,6% tiene potencial de subir.
         </p>
       </div>
     </div>
