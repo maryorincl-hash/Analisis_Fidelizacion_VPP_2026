@@ -264,7 +264,7 @@
     <div class="chart-grid-2">
       <div class="card">
         <h3>Distribución de leads con patente</h3>
-        <div class="card-sub">Estado del lead respecto a la reserva de la patente</div>
+        <div class="card-sub">Del total de 65.421 leads con patente · Leads sin reserva incluyen antes y sin reserva</div>
         <div class="chart-wrap medium">
           <canvas id="chartDistribucion"></canvas>
         </div>
@@ -660,8 +660,8 @@ new Chart(document.getElementById('chartMensual'), {
 new Chart(document.getElementById('chartDistribucion'), {
   type: 'doughnut',
   data: {
-    labels: ['Antes de reserva','Después de reserva','Sin reserva (patente libre)'],
-    datasets: [{ data:[35952,12499,16970], backgroundColor:[C.azul2,C.naranja,C.gris], borderWidth:2, hoverOffset:6 }]
+    labels: ['Leads sin reserva','Leads post-reserva'],
+    datasets: [{ data:[52922,12499], backgroundColor:[C.azul2,C.naranja], borderWidth:2, hoverOffset:6 }]
   },
   options: {
     ...dflt,
@@ -757,6 +757,7 @@ new Chart(document.getElementById('chartModelos'), {
       legend:{ display:false },
       tooltip:{ callbacks:{ label: ctx => ` ${ctx.parsed.y.toLocaleString('es-CL')} leads` } },
       datalabels: {
+        display: true,
         anchor: 'end', align: 'top',
         color: '#1a1a2e',
         font: { weight:'bold', size:11 },
