@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM Llaima</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap');
+  :root {
+    --vip:#7c3aed; --vip-bg:#f5f3ff; --vip-border:#c4b5fd;
+    --oro:#b45309; --oro-bg:#fffbeb; --oro-border:#fde68a;
+    --plata:#475569; --plata-bg:#f1f5f9; --plata-border:#cbd5e1;
+    --bronce:#92400e; --bronce-bg:#fef3c7; --bronce-border:#fcd34d;
+    --rojo:#dc2626; --rojo-bg:#fef2f2;
+    --verde:#16a34a; --verde-bg:#f0fdf4;
+    --azul:#1d4ed8; --azul-bg:#eff6ff;
+    --naranja:#ea580c; --naranja-bg:#fff7ed;
+    --gris:#64748b; --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0;
+    --text:#0f172a; --text2:#475569;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+
+  .header{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#1d4ed8 100%);color:#fff;padding:36px 40px 28px}
+  .header h1{font-size:24px;font-weight:800;letter-spacing:-.5px}
+  .header p{color:#94a3b8;margin-top:6px;font-size:13px}
+  .header-meta{display:flex;gap:14px;margin-top:16px;flex-wrap:wrap}
+  .header-meta span{background:rgba(255,255,255,.1);border-radius:6px;padding:4px 12px;font-size:11px;color:#cbd5e1}
+
+  .nav{background:#fff;border-bottom:1px solid var(--border);padding:0 40px;display:flex;gap:0;overflow-x:auto;position:sticky;top:0;z-index:100}
+  .nav a{display:block;padding:13px 15px;font-size:12px;font-weight:600;color:var(--gris);text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap}
+  .nav a:hover{color:var(--azul);border-bottom-color:var(--azul)}
+
+  .container{max-width:1200px;margin:0 auto;padding:32px 40px}
+  .section{margin-bottom:52px}
+  .section-title{font-size:17px;font-weight:800;color:var(--text);margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px}
+
+  /* KPI CARDS */
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+  .kpi-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+  .kpi-card .label{font-size:10px;font-weight:700;color:var(--gris);text-transform:uppercase;letter-spacing:.5px}
+  .kpi-card .value{font-size:26px;font-weight:800;margin-top:4px}
+  .kpi-card .sub{font-size:11px;color:var(--gris);margin-top:2px}
+  .kpi-card.blue{border-top:3px solid var(--azul)}.kpi-card.blue .value{color:var(--azul)}
+  .kpi-card.green{border-top:3px solid var(--verde)}.kpi-card.green .value{color:var(--verde)}
+  .kpi-card.red{border-top:3px solid var(--rojo)}.kpi-card.red .value{color:var(--rojo)}
+  .kpi-card.orange{border-top:3px solid var(--naranja)}.kpi-card.orange .value{color:var(--naranja)}
+  .kpi-card.purple{border-top:3px solid var(--vip)}.kpi-card.purple .value{color:var(--vip)}
+
+  /* BADGES */
+  .badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700}
+  .badge.vip{background:var(--vip-bg);color:var(--vip)}
+  .badge.oro{background:var(--oro-bg);color:var(--oro)}
+  .badge.plata{background:var(--plata-bg);color:var(--plata)}
+  .badge.bronce{background:var(--bronce-bg);color:var(--bronce)}
+
+  /* TABLES */
+  .table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+  table{width:100%;border-collapse:collapse;background:var(--card);font-size:13px}
+  thead th{background:#f1f5f9;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--gris);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+  tbody td{padding:9px 14px;border-bottom:1px solid var(--border)}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:#f8fafc}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  td.bold{font-weight:700}
+
+  /* BARS */
+  .pct-bar{display:flex;align-items:center;gap:8px}
+  .bar-bg{flex:1;background:#e2e8f0;border-radius:99px;height:6px;min-width:60px}
+  .bar-fill{height:6px;border-radius:99px}
+  .bar-fill.green{background:var(--verde)}.bar-fill.red{background:var(--rojo)}
+  .bar-fill.blue{background:var(--azul)}.bar-fill.orange{background:var(--naranja)}
+  .bar-fill.purple{background:var(--vip)}
+
+  /* RANK */
+  .rank{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:700;margin-right:4px}
+  .rank.g{background:#fde68a;color:#92400e}.rank.s{background:#e2e8f0;color:#475569}.rank.b{background:#fcd34d;color:#78350f}.rank.n{background:#f1f5f9;color:#64748b}
+
+  /* ALERTS */
+  .alert-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+  .alert{border-radius:8px;padding:13px 15px;border-left:4px solid;display:flex;gap:10px}
+  .alert.red{background:var(--rojo-bg);border-color:var(--rojo)}
+  .alert.orange{background:var(--naranja-bg);border-color:var(--naranja)}
+  .alert.green{background:var(--verde-bg);border-color:var(--verde)}
+  .alert.blue{background:var(--azul-bg);border-color:var(--azul)}
+  .alert-icon{font-size:18px;flex-shrink:0}
+  .alert-body strong{display:block;font-size:12px;font-weight:700;margin-bottom:2px}
+  .alert-body span{font-size:12px;color:var(--text2)}
+
+  /* FUNNEL VISUAL — nuevo diseño */
+  .funnel-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  @media(max-width:768px){.funnel-grid{grid-template-columns:1fr}}
+
+  .funnel-block{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 24px}
+  .funnel-block h3{font-size:14px;font-weight:800;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px}
+
+  /* Una tarjeta por segmento dentro del bloque */
+  .fseg{margin-bottom:0;padding:18px 0 18px;border-bottom:3px solid var(--border);position:relative}
+  .fseg:last-child{border-bottom:none;padding-bottom:4px}
+  .fseg-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;border-radius:8px;border:1.5px solid var(--border)}
+  .fseg-header.h-vip{background:var(--vip-bg);border-color:var(--vip-border)}
+  .fseg-header.h-oro{background:var(--oro-bg);border-color:var(--oro-border)}
+  .fseg-header.h-plata{background:var(--plata-bg);border-color:var(--plata-border)}
+  .fseg-header.h-bronce{background:var(--bronce-bg);border-color:var(--bronce-border)}
+  .fseg-header .badge{font-size:13px;padding:5px 14px;letter-spacing:.2px}
+  .fseg-header .fseg-total{font-size:12px;color:var(--gris);margin-left:auto;font-weight:600}
+  .fseg-header .fseg-leads-ref{font-size:11px;color:var(--gris);font-variant-numeric:tabular-nums}
+
+  /* Fila de funnel */
+  .frow{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .frow-label{font-size:11px;font-weight:600;width:118px;flex-shrink:0;color:var(--text2)}
+  .frow-track{flex:1;background:#f1f5f9;border-radius:6px;height:22px;position:relative;overflow:hidden}
+  .frow-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:8px;transition:width .4s ease;min-width:2px}
+  .frow-fill span{font-size:10px;font-weight:700;color:#fff;white-space:nowrap;opacity:0}
+  .frow-fill.wide span{opacity:1}   /* show label when bar is wide enough */
+  .frow-meta{display:flex;align-items:center;gap:6px;width:86px;flex-shrink:0;justify-content:flex-end}
+  .frow-n{font-size:14px;font-weight:800}
+  .frow-pct{font-size:11px;font-weight:700;padding:1px 6px;border-radius:99px}
+
+  /* Colores por tipo de fila */
+  .frow-fill.leads   {background:linear-gradient(90deg,#bfdbfe,#93c5fd)}   /* azul claro */
+  .frow-fill.calific {background:linear-gradient(90deg,#3b82f6,#1d4ed8)}   /* azul oscuro */
+  .frow-fill.venta   {background:linear-gradient(90deg,#22c55e,#15803d)}   /* verde */
+  .frow-fill.descart {background:linear-gradient(90deg,#fca5a5,#ef4444)}   /* rojo */
+
+  .frow-n.leads   {color:#1d4ed8}
+  .frow-n.calific {color:#1d4ed8}
+  .frow-n.venta   {color:#15803d}
+  .frow-n.descart {color:#dc2626}
+
+  .frow-pct.leads   {background:#dbeafe;color:#1d4ed8}
+  .frow-pct.calific {background:#dbeafe;color:#1d4ed8}
+  .frow-pct.venta   {background:#dcfce7;color:#15803d}
+  .frow-pct.descart {background:#fee2e2;color:#dc2626}
+
+  .frow-fill.recup  {background:linear-gradient(90deg,#fde68a,#d97706)}
+  .frow-n.recup     {color:#b45309}
+  .frow-pct.recup   {background:#fef3c7;color:#b45309}
+
+  /* separador visual entre leads positivos y negativos */
+  .frow-sep{height:1px;background:var(--border);margin:8px 0 8px 128px}
+
+  /* ratio calificado a venta */
+  .fcal-ratio{font-size:10px;color:var(--gris);padding:3px 0 0 128px;margin-bottom:2px}
+  .fcal-ratio strong{color:var(--text)}
+
+  /* SEG CARDS */
+  .seg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+  .seg-card{border-radius:10px;padding:18px;border:1px solid}
+  .seg-card.vip{background:var(--vip-bg);border-color:var(--vip-border)}
+  .seg-card.oro{background:var(--oro-bg);border-color:var(--oro-border)}
+  .seg-card.plata{background:var(--plata-bg);border-color:var(--plata-border)}
+  .seg-card.bronce{background:var(--bronce-bg);border-color:var(--bronce-border)}
+  .seg-card h3{font-size:14px;font-weight:700;margin-bottom:12px}
+  .seg-card.vip h3{color:var(--vip)}.seg-card.oro h3{color:var(--oro)}
+  .seg-card.plata h3{color:var(--plata)}.seg-card.bronce h3{color:var(--bronce)}
+  .acc-btn{width:100%;text-align:left;border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:4px;font-family:inherit;font-size:11px;font-weight:600;transition:opacity .15s}
+  .acc-btn.open{border-radius:8px 8px 0 0;margin-bottom:0;border-bottom-color:transparent}
+  .acc-body{display:none;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:10px 12px;margin-bottom:6px;background:var(--card)}
+  .acc-arrow{margin-left:auto;font-size:10px;transition:transform .2s;display:inline-block;color:var(--gris)}
+  .acc-btn.open .acc-arrow{transform:rotate(180deg)}
+  .acc-vip{background:var(--vip-bg);border-color:var(--vip-border);color:var(--vip)}
+  .acc-oro{background:var(--oro-bg);border-color:var(--oro-border);color:var(--oro)}
+  .acc-plata{background:var(--plata-bg);border-color:var(--plata-border);color:var(--plata)}
+  .acc-bronce{background:var(--bronce-bg);border-color:var(--bronce-border);color:var(--bronce)}
+  .jstep-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
+  .jstep-circle{width:22px;height:22px;border-radius:50%;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+  .jstep-t{font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px}
+  .jstep-d{font-size:10px;color:var(--text2);line-height:1.4}
+  .jconn{margin-left:11px;border-left:2px dashed var(--border);height:6px;margin-bottom:2px}
+  .jbadge{font-size:9px;padding:1px 6px;border-radius:8px;font-weight:600;margin-left:6px}
+  .jb-ia{background:#f3e8ff;color:#6b21a8}.jb-exec{background:#dbeafe;color:#1e40af}.jb-auto{background:#dcfce7;color:#166534}.jb-sla{background:#fef3c7;color:#92400e}
+  .ben-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+  .ben-item{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px}
+  .ben-t{font-size:10px;font-weight:700;margin-bottom:1px;color:var(--text)}
+  .ben-d{font-size:9px;color:var(--text2)}
+  .cn-block{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
+  .cn-title{font-size:13px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px;color:var(--text)}
+  .cn-row{background:var(--azul-bg);border-left:3px solid var(--azul);border-radius:0 6px 6px 0;padding:7px 12px;margin-bottom:6px;font-size:11px}
+  .cn-row strong{color:var(--azul)}
+  .cn-pill{display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;margin:3px 3px 3px 0}
+  .fase-block{border-left:3px solid var(--azul);padding:8px 12px;margin-bottom:8px;background:var(--card);border-radius:0 6px 6px 0}
+  .fase-tag{font-size:10px;font-weight:700;color:var(--azul);margin-bottom:3px}
+  .fase-items{font-size:10px;color:var(--text2)}
+  .seg-stat{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:12px}
+  .seg-stat:last-child{border-bottom:none}
+  .seg-stat .sl{color:var(--text2)}.seg-stat .sv{font-weight:700}
+  .sv.green{color:var(--verde)}.sv.red{color:var(--rojo)}.sv.orange{color:var(--naranja)}
+
+  /* MOTIVOS */
+  .motivo-row{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);gap:10px}
+  .motivo-row:last-child{border-bottom:none}
+  .motivo-name{font-size:12px;color:var(--text2);flex:1}
+  .motivo-pct{font-size:12px;font-weight:700;min-width:40px;text-align:right}
+  .motivo-bar{width:70px;background:#e2e8f0;border-radius:99px;height:5px;flex-shrink:0}
+  .motivo-bar-fill{height:5px;border-radius:99px;background:var(--azul)}
+
+  /* TABS */
+  .tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:2px solid var(--border)}
+  .tab-btn{padding:8px 18px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--gris);border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:6px 6px 0 0;transition:all .15s}
+  .tab-btn.active{color:var(--azul);border-bottom-color:var(--azul);background:var(--azul-bg)}
+  .tab-content{display:none}.tab-content.active{display:block}
+  .mtab.active{color:var(--vip)!important;border-bottom-color:var(--vip)!important;background:#f3e8ff}
+  .utab.active{color:#1d4ed8!important;border-bottom-color:#1d4ed8!important;background:#eff6ff}
+  .mtabn.active{color:var(--azul)!important;border-bottom-color:var(--azul)!important;background:var(--azul-bg)}
+  .mtabu.active{color:var(--verde)!important;border-bottom-color:var(--verde)!important;background:#f0fdf4}
+  .tab2-btn{padding:8px 18px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--gris);border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:6px 6px 0 0;transition:all .15s}
+  .tab2-btn.active{color:var(--azul);border-bottom-color:var(--azul);background:var(--azul-bg)}
+  .tab2-content{display:none}.tab2-content.active{display:block}
+  .tab3-btn{padding:8px 18px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--gris);border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:6px 6px 0 0;transition:all .15s}
+  .tab3-btn.active{color:var(--azul);border-bottom-color:var(--azul);background:var(--azul-bg)}
+  .tab3-content{display:none}.tab3-content.active{display:block}
+  .tab4-btn{padding:8px 18px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--gris);border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:6px 6px 0 0;transition:all .15s}
+  .tab4-btn.active{color:var(--azul);border-bottom-color:var(--azul);background:var(--azul-bg)}
+  .tab4-content{display:none}.tab4-content.active{display:block}
+    .tab5-btn{padding:8px 18px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--gris);border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:6px 6px 0 0;transition:all .15s}
+    .tab5-btn.active{color:var(--azul);border-bottom-color:var(--azul);background:var(--azul-bg)}
+    .tab5-content{display:none}.tab5-content.active{display:block}
+
+  /* TWO COL */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  @media(max-width:768px){.two-col{grid-template-columns:1fr}.container{padding:20px}.header{padding:24px 20px}.nav{padding:0 20px}}
+
+  /* HIGHLIGHT BOX */
+  .highlight{background:linear-gradient(135deg,var(--azul-bg),#f0fdf4);border:1px solid #bfdbfe;border-radius:10px;padding:16px 20px;margin-bottom:20px}
+  .highlight h4{font-size:13px;font-weight:700;color:var(--azul);margin-bottom:5px}
+  .highlight p{font-size:12px;color:var(--text2)}
+
+  hr.div{border:none;border-top:1px solid var(--border);margin:24px 0}
+
+  /* NOTA */
+  .nota{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:11px;color:var(--gris);margin-bottom:16px}
+  .nota strong{color:var(--text2)}
+
+  /* FOOTER */
+  .footer{background:#1e293b;color:#64748b;padding:18px 40px;font-size:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .footer span{color:#94a3b8}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1 style="font-family:'Montserrat',sans-serif;font-weight:800;letter-spacing:-1px">CRM Llaima</h1>
+  <p>Funnel completo: Lead → Calificado → Venta Facturada | Líneas Nuevos y Usados</p>
+  <div class="header-meta">
+    <span>📅 Período: Enero – Mayo 2026</span>
+    <span>📋 2.650 leads VPP</span>
+    <span>🔗 157 ventas trazadas desde lead</span>
+    <span>🏢 Fuente: CRM Llaima</span>
+  </div>
+</div>
+
+<nav class="nav">
+  <a href="#resumen">Resumen</a>
+  <a href="#funnel">Funnel Real</a>
+  <a href="#volumen">Volumen</a>
+  <a href="#kpis">KPIs</a>
+  <a href="#descartes">Motivos Descarte</a>
+  <a href="#insights">Insights</a>
+
+</nav>
+
+<div class="container">
+
+<!-- ========== RESUMEN ========== -->
+<div id="resumen" class="section">
+  <div class="section-title">📌 Resumen Ejecutivo — Leads con Segmento de Valor</div>
+  <div class="tabs" style="margin-bottom:0">
+    <button class="tab3-btn active" onclick="showTab3(event,'res-total')">📊 Total</button>
+    <button class="tab3-btn" onclick="showTab3(event,'res-nuevos')">🆕 Nuevos</button>
+    <button class="tab3-btn" onclick="showTab3(event,'res-usados')">🚗 Usados</button>
+  </div>
+
+  <div id="res-total" class="tab3-content active">
+  <div class="kpi-grid" style="margin-bottom:14px">
+    <div class="kpi-card blue"><div class="label">Leads VPP totales</div><div class="value">2.650</div><div class="sub">Ene–May 2026</div></div>
+    <div class="kpi-card green">
+      <div class="label">Ventas con lead previo</div>
+      <div class="value">157</div>
+      <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;background:#f0fdf4;border-radius:5px;padding:3px 7px">
+          <span style="color:var(--verde);font-weight:700">✅ Solo Calificado</span>
+          <span style="font-weight:800;color:var(--verde)">55</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;background:#fee2e2;border-radius:5px;padding:3px 7px">
+          <span style="color:var(--rojo);font-weight:700">⚠️ Solo Descartado</span>
+          <span style="font-weight:800;color:var(--rojo)">83</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;background:#f8fafc;border-radius:5px;padding:3px 7px">
+          <span style="color:var(--gris);font-weight:600">Cal. + Desc. / otras</span>
+          <span style="font-weight:800;color:var(--text2)">19</span>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-card green"><div class="label">Tasa cierre Calificado</div><div class="value">17.4%</div><div class="sub">67 de 385 calificados → venta</div></div>
+    <div class="kpi-card red">
+      <div class="label">Tasa descarte global</div>
+      <div class="value">76.6%</div>
+      <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;background:#fef2f2;border-radius:5px;padding:3px 7px">
+          <span style="color:var(--gris);font-weight:600">Total descartados</span>
+          <span style="font-weight:800;color:var(--text2)">2.029</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;background:#fee2e2;border-radius:5px;padding:3px 7px">
+          <span style="color:var(--rojo);font-weight:700">⚠️ Compraron igual</span>
+          <span style="font-weight:800;color:var(--rojo)">83 <span style="font-weight:400;color:var(--gris)">(4.1%)</span></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;background:#fee2e2;border-radius:5px;padding:3px 7px">
+          <span style="color:var(--rojo);font-weight:700">🚨 Descarte incorrecto</span>
+          <span style="font-weight:800;color:var(--rojo)">32 <span style="font-weight:400;color:var(--gris)">(39%)</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-card orange"><div class="label">Tasa conversión lead</div><div class="value">14.5%</div><div class="sub">385 calificados</div></div>
+  </div>
+  </div><!-- /res-total -->
+
+  <div id="res-nuevos" class="tab3-content">
+  <div class="kpi-grid" style="margin-bottom:14px">
+    <div class="kpi-card blue"><div class="label">Leads VPP Nuevos</div><div class="value">1.597</div><div class="sub">Ene–May 2026</div></div>
+    <div class="kpi-card green">
+      <div class="label">Ventas trazadas</div>
+      <div class="value">97</div>
+      <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;background:#f0fdf4;border-radius:5px;padding:3px 7px">
+          <span style="color:var(--verde);font-weight:700">✅ Desde calificado</span>
+          <span style="font-weight:800;color:var(--verde)">40</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;background:#fef3c7;border-radius:5px;padding:3px 7px">
+          <span style="color:#b45309;font-weight:700">⚠️ Desc. que compraron</span>
+          <span style="font-weight:800;color:#b45309">53</span>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-card green"><div class="label">Tasa cierre real</div><div class="value">6.1%</div><div class="sub">97 de 1.597 leads</div></div>
+    <div class="kpi-card red">
+      <div class="label">Tasa descarte</div>
+      <div class="value">77.3%</div>
+      <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;background:#fef2f2;border-radius:5px;padding:3px 7px">
+          <span style="color:var(--gris);font-weight:600">Total descartados</span>
+          <span style="font-weight:800;color:var(--text2)">1.235</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;background:#fef3c7;border-radius:5px;padding:3px 7px">
+          <span style="color:#b45309;font-weight:700">⚠️ Compraron igual</span>
+          <span style="font-weight:800;color:#b45309">53 <span style="font-weight:400;color:var(--gris)">(4.3%)</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-card orange"><div class="label">Tasa conversión lead</div><div class="value">11.0%</div><div class="sub">175 calificados</div></div>
+  </div>
+  </div><!-- /res-nuevos -->
+
+  <div id="res-usados" class="tab3-content">
+  <div class="kpi-grid" style="margin-bottom:14px">
+    <div class="kpi-card blue"><div class="label">Leads VPP Usados</div><div class="value">1.053</div><div class="sub">Ene–May 2026</div></div>
+    <div class="kpi-card green">
+      <div class="label">Ventas trazadas</div>
+      <div class="value">60</div>
+      <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;background:#f0fdf4;border-radius:5px;padding:3px 7px">
+          <span style="color:var(--verde);font-weight:700">✅ Desde calificado</span>
+          <span style="font-weight:800;color:var(--verde)">23</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;background:#fef3c7;border-radius:5px;padding:3px 7px">
+          <span style="color:#b45309;font-weight:700">⚠️ Desc. que compraron</span>
+          <span style="font-weight:800;color:#b45309">30</span>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-card green"><div class="label">Tasa cierre real</div><div class="value">5.7%</div><div class="sub">60 de 1.053 leads</div></div>
+    <div class="kpi-card red">
+      <div class="label">Tasa descarte</div>
+      <div class="value">75.4%</div>
+      <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;background:#fef2f2;border-radius:5px;padding:3px 7px">
+          <span style="color:var(--gris);font-weight:600">Total descartados</span>
+          <span style="font-weight:800;color:var(--text2)">794</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;background:#fef3c7;border-radius:5px;padding:3px 7px">
+          <span style="color:#b45309;font-weight:700">⚠️ Compraron igual</span>
+          <span style="font-weight:800;color:#b45309">30 <span style="font-weight:400;color:var(--gris)">(3.8%)</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-card orange"><div class="label">Tasa conversión lead</div><div class="value">19.9%</div><div class="sub">210 calificados</div></div>
+  </div>
+  </div><!-- /res-usados -->
+
+  <!-- FILA INFERIOR: descartados + hallazgos -->
+  <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:18px">
+
+    <!-- IZQUIERDA: KPI EXPANDIDO descartados -->
+    <div style="flex:3;min-width:0;background:#faf5ff;border:1.5px solid #c4b5fd;border-radius:12px;padding:16px 18px">
+
+      <!-- encabezado total -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:var(--vip);text-transform:uppercase;letter-spacing:.5px">Leads descartados que compraron</div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-top:2px">
+          <div style="font-size:32px;font-weight:800;color:var(--vip);line-height:1.1">83</div>
+          <div style="font-size:11px;color:var(--gris)">1.9% del total de ventas 2026 — lead solo descartado previo al cierre</div>
+        </div>
+      </div>
+
+      <!-- TABS GRANDES: Nuevos / Usados -->
+      <div style="display:flex;gap:0;border-bottom:2px solid #ddd6fe;margin-bottom:14px">
+        <button class="bltab active" onclick="showBltab(event,'blt-n')"
+          style="flex:1;padding:9px 0;font-size:13px;font-weight:800;border:none;background:none;cursor:pointer;
+                 color:#1d4ed8;border-bottom:3px solid #1d4ed8;margin-bottom:-2px;border-radius:6px 6px 0 0;
+                 transition:all .15s;letter-spacing:.2px">
+          🚗 NUEVOS &nbsp;<span style="font-size:18px;font-weight:900">53</span>
+        </button>
+        <button class="bltab" onclick="showBltab(event,'blt-u')"
+          style="flex:1;padding:9px 0;font-size:13px;font-weight:800;border:none;background:none;cursor:pointer;
+                 color:var(--gris);border-bottom:3px solid transparent;margin-bottom:-2px;border-radius:6px 6px 0 0;
+                 transition:all .15s;letter-spacing:.2px">
+          🔄 USADOS &nbsp;<span style="font-size:18px;font-weight:900">30</span>
+        </button>
+      </div>
+
+      <!-- CONTENIDO NUEVOS -->
+      <div id="blt-n" class="bltab-content" style="display:block;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Por segmento de valor — Nuevos</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge oro" style="width:52px;text-align:center;flex-shrink:0">Oro</span>
+            <div style="flex:1;background:#dbeafe;border-radius:6px;height:18px;overflow:hidden"><div style="width:100%;height:100%;background:linear-gradient(90deg,#fde68a,#b45309);border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:10px;font-weight:700;color:#fff">22 ventas</span></div></div>
+            <span style="font-size:12px;font-weight:700;color:var(--oro);width:32px;text-align:right;flex-shrink:0">42%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge plata" style="width:52px;text-align:center;flex-shrink:0">Plata</span>
+            <div style="flex:1;background:#dbeafe;border-radius:6px;height:18px;overflow:hidden"><div style="width:59%;height:100%;background:linear-gradient(90deg,#cbd5e1,#475569);border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:10px;font-weight:700;color:#fff">13 ventas</span></div></div>
+            <span style="font-size:12px;font-weight:700;color:var(--plata);width:32px;text-align:right;flex-shrink:0">25%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge bronce" style="width:52px;text-align:center;flex-shrink:0">Bronce</span>
+            <div style="flex:1;background:#dbeafe;border-radius:6px;height:18px;overflow:hidden"><div style="width:59%;height:100%;background:linear-gradient(90deg,#fcd34d,#92400e);border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:10px;font-weight:700;color:#fff">13 ventas</span></div></div>
+            <span style="font-size:12px;font-weight:700;color:var(--bronce);width:32px;text-align:right;flex-shrink:0">25%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge vip" style="width:52px;text-align:center;flex-shrink:0">VIP</span>
+            <div style="flex:1;background:#dbeafe;border-radius:6px;height:18px;overflow:hidden"><div style="width:23%;height:100%;background:linear-gradient(90deg,#c4b5fd,#7c3aed);border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:10px;font-weight:700;color:#fff">5</span></div></div>
+            <span style="font-size:12px;font-weight:700;color:var(--vip);width:32px;text-align:right;flex-shrink:0">9%</span>
+          </div>
+        </div>
+        <div style="border-top:1.5px solid #ddd6fe;padding-top:12px;margin-top:4px">
+          <div style="display:flex;gap:3px;border-bottom:2px solid #e9d5ff;margin-bottom:10px">
+            <button class="mtabn active" onclick="showMtabN(event,'mtn-motivo')" style="padding:5px 12px;font-size:11px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--azul);border-bottom:2px solid var(--azul);background:var(--azul-bg);margin-bottom:-2px;border-radius:4px 4px 0 0">Por motivo de descarte</button>
+            <button class="mtabn" onclick="showMtabN(event,'mtn-interp')" style="padding:5px 12px;font-size:11px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--gris);border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:4px 4px 0 0">Interpretación</button>
+          </div>
+          <div id="mtn-motivo" class="mtabn-content" style="display:block">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 8px;border-radius:6px;background:#fee2e2"><span style="color:var(--rojo);font-weight:600">🔴 Descarte Masivo</span><span style="font-weight:800;color:var(--rojo)">13 <span style="font-weight:400;font-size:11px">(25%)</span></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 8px;border-radius:6px;background:#fee2e2"><span style="color:var(--rojo);font-weight:600">🔴 Duplicado</span><span style="font-weight:800;color:var(--rojo)">10 <span style="font-weight:400;font-size:11px">(19%)</span></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 8px;border-radius:6px;background:#f0fdf4"><span style="color:var(--verde);font-weight:600">✅ Compró con nosotros</span><span style="font-weight:800;color:var(--verde)">8 <span style="font-weight:400;font-size:11px">(15%)</span></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 8px;border-radius:6px;background:#fff7ed"><span style="color:var(--naranja);font-weight:600">⚠️ Desiste, quería info</span><span style="font-weight:800;color:var(--naranja)">7 <span style="font-weight:400;font-size:11px">(13%)</span></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 8px;border-radius:6px;background:#fff7ed"><span style="color:var(--naranja);font-weight:600">⚠️ Neg. por financiamiento</span><span style="font-weight:800;color:var(--naranja)">4 <span style="font-weight:400;font-size:11px">(8%)</span></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 8px;border-radius:6px;background:#f8fafc"><span style="color:var(--text2)">Desiste sin motivos</span><span style="font-weight:800">3 <span style="font-weight:400;font-size:11px">(6%)</span></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 8px;border-radius:6px;background:#f8fafc"><span style="color:var(--text2)">Neg. por VPP</span><span style="font-weight:800">2 <span style="font-weight:400;font-size:11px">(4%)</span></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 8px;border-radius:6px;background:#fef2f2"><span style="color:var(--rojo)">🔴 Compró en otro concesionario</span><span style="font-weight:800;color:var(--rojo)">2 <span style="font-weight:400;font-size:11px">(4%)</span></span></div>
+            </div>
+          </div>
+          <div id="mtn-interp" class="mtabn-content" style="display:none">
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div style="background:#fee2e2;border-left:3px solid var(--rojo);border-radius:0 8px 8px 0;padding:9px 11px">
+                <div style="font-size:11px;font-weight:700;color:var(--rojo);margin-bottom:2px">🚨 Descarte incorrecto — 25 casos (47%)</div>
+                <p style="font-size:10px;color:var(--text2);margin:0">Descarte Masivo (13) + Duplicado (10) + Compró en otro (2). Leads válidos mal gestionados en Nuevos que cerraron sin seguimiento.</p>
+              </div>
+              <div style="background:#fff7ed;border-left:3px solid var(--naranja);border-radius:0 8px 8px 0;padding:9px 11px">
+                <div style="font-size:11px;font-weight:700;color:var(--naranja);margin-bottom:2px">⚠️ Descarte prematuro — 16 casos (30%)</div>
+                <p style="font-size:10px;color:var(--text2);margin:0">Quería info (7) + Financiamiento (4) + Sin motivos (3) + Por VPP (2). El cliente parecía sin interés pero volvió y compró.</p>
+              </div>
+              <div style="background:#f0fdf4;border-left:3px solid var(--verde);border-radius:0 8px 8px 0;padding:9px 11px">
+                <div style="font-size:11px;font-weight:700;color:var(--verde);margin-bottom:2px">✅ Cierre correcto — 8 casos (15%)</div>
+                <p style="font-size:10px;color:var(--text2);margin:0">Compró con nosotros (8). El lead fue descartado correctamente en Nuevos.</p>
+              </div>
+              <div style="background:#f8fafc;border-radius:8px;padding:7px 11px;font-size:10px;color:var(--gris)">4 casos restantes (8%) sin clasificar.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENIDO USADOS -->
+      <div id="blt-u" class="bltab-content" style="display:none;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Por segmento de valor — Usados</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge vip" style="width:52px;text-align:center;flex-shrink:0">VIP</span>
+            <div style="flex:1;background:#dcfce7;border-radius:6px;height:18px;overflow:hidden"><div style="width:100%;height:100%;background:linear-gradient(90deg,#c4b5fd,#7c3aed);border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:10px;font-weight:700;color:#fff">9 ventas</span></div></div>
+            <span style="font-size:12px;font-weight:700;color:var(--vip);width:32px;text-align:right;flex-shrink:0">30%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge plata" style="width:52px;text-align:center;flex-shrink:0">Plata</span>
+            <div style="flex:1;background:#dcfce7;border-radius:6px;height:18px;overflow:hidden"><div style="width:78%;height:100%;background:linear-gradient(90deg,#cbd5e1,#475569);border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:10px;font-weight:700;color:#fff">7 ventas</span></div></div>
+            <span style="font-size:12px;font-weight:700;color:var(--plata);width:32px;text-align:right;flex-shrink:0">23%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge oro" style="width:52px;text-align:center;flex-shrink:0">Oro</span>
+            <div style="flex:1;background:#dcfce7;border-radius:6px;height:18px;overflow:hidden"><div style="width:78%;height:100%;background:linear-gradient(90deg,#fde68a,#b45309);border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:10px;font-weight:700;color:#fff">7 ventas</span></div></div>
+            <span style="font-size:12px;font-weight:700;color:var(--oro);width:32px;text-align:right;flex-shrink:0">23%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge bronce" style="width:52px;text-align:center;flex-shrink:0">Bronce</span>
+            <div style="flex:1;background:#dcfce7;border-radius:6px;height:18px;overflow:hidden"><div style="width:78%;height:100%;background:linear-gradient(90deg,#fcd34d,#92400e);border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:10px;font-weight:700;color:#fff">7 ventas</span></div></div>
+            <span style="font-size:12px;font-weight:700;color:var(--bronce);width:32px;text-align:right;flex-shrink:0">23%</span>
+          </div>
+        </div>
+        <div style="border-top:1.5px solid #ddd6fe;padding-top:12px;margin-top:4px">
+          <div style="display:flex;gap:3px;border-bottom:2px solid #e9d5ff;margin-bottom:10px">
+            <button class="mtabu active" onclick="showMtabU(event,'mtu-motivo')" style="padding:5px 12px;font-size:11px;font-weight:700;border:none;background:none;cursor:pointer;color:#16a34a;border-bottom:2px solid #16a34a;background:#f0fdf4;margin-bottom:-2px;border-radius:4px 4px 0 0">Por motivo de descarte</button>
+            <button class="mtabu" onclick="showMtabU(event,'mtu-interp')" style="padding:5px 12px;font-size:11px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--gris);border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:4px 4px 0 0">Interpretación</button>
+          </div>
+          <div id="mtu-motivo" class="mtabu-content" style="display:block">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 8px;border-radius:6px;background:#f0fdf4"><span style="color:var(--verde);font-weight:600">✅ Compró con nosotros</span><span style="font-weight:800;color:var(--verde)">6 <span style="font-weight:400;font-size:11px">(20%)</span></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 8px;border-radius:6px;background:#fee2e2"><span style="color:var(--rojo);font-weight:600">🔴 Duplicado</span><span style="font-weight:800;color:var(--rojo)">5 <span style="font-weight:400;font-size:11px">(17%)</span></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 8px;border-radius:6px;background:#fff7ed"><span style="color:var(--naranja);font-weight:600">⚠️ No contesta</span><span style="font-weight:800;color:var(--naranja)">4 <span style="font-weight:400;font-size:11px">(13%)</span></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 8px;border-radius:6px;background:#fff7ed"><span style="color:var(--naranja);font-weight:600">⚠️ Neg. por ubicación</span><span style="font-weight:800;color:var(--naranja)">3 <span style="font-weight:400;font-size:11px">(10%)</span></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 8px;border-radius:6px;background:#f8fafc"><span style="color:var(--text2)">Ya atendido en sucursal</span><span style="font-weight:800">2 <span style="font-weight:400;font-size:11px">(7%)</span></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 8px;border-radius:6px;background:#f8fafc"><span style="color:var(--text2)">Neg. por stock</span><span style="font-weight:800">2 <span style="font-weight:400;font-size:11px">(7%)</span></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 8px;border-radius:6px;background:#fee2e2"><span style="color:var(--rojo);font-weight:600">🔴 Lista Negra RUT</span><span style="font-weight:800;color:var(--rojo)">2 <span style="font-weight:400;font-size:11px">(7%)</span></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 8px;border-radius:6px;background:#f8fafc"><span style="color:var(--text2)">Desiste sin motivos</span><span style="font-weight:800">2 <span style="font-weight:400;font-size:11px">(7%)</span></span></div>
+            </div>
+          </div>
+          <div id="mtu-interp" class="mtabu-content" style="display:none">
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div style="background:#fff7ed;border-left:3px solid var(--naranja);border-radius:0 8px 8px 0;padding:9px 11px">
+                <div style="font-size:11px;font-weight:700;color:var(--naranja);margin-bottom:2px">⚠️ Descarte prematuro — 9 casos (30%)</div>
+                <p style="font-size:10px;color:var(--text2);margin:0">No contesta (4) + Por ubicación (3) + Sin motivos (2). El cliente VPP recuperó el interés — señal de reactivación tardía en Usados.</p>
+              </div>
+              <div style="background:#f0fdf4;border-left:3px solid var(--verde);border-radius:0 8px 8px 0;padding:9px 11px">
+                <div style="font-size:11px;font-weight:700;color:var(--verde);margin-bottom:2px">✅ Cierre correcto — 8 casos (27%)</div>
+                <p style="font-size:10px;color:var(--text2);margin:0">Compró con nosotros (6) + Ya atendido en sucursal (2). El lead fue descartado correctamente en Usados.</p>
+              </div>
+              <div style="background:#fee2e2;border-left:3px solid var(--rojo);border-radius:0 8px 8px 0;padding:9px 11px">
+                <div style="font-size:11px;font-weight:700;color:var(--rojo);margin-bottom:2px">🚨 Descarte incorrecto — 7 casos (23%)</div>
+                <p style="font-size:10px;color:var(--text2);margin:0">Duplicado (5) + Lista Negra RUT (2). Leads gestionables que cerraron sin acompañamiento en Usados.</p>
+              </div>
+              <div style="background:#f8fafc;border-radius:8px;padding:7px 11px;font-size:10px;color:var(--gris)">6 casos restantes (20%) sin clasificar.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DERECHA: hallazgos clave -->
+    <div style="flex:2;min-width:0">
+      <div style="font-size:13px;font-weight:800;color:var(--text);letter-spacing:-.2px;margin-bottom:10px;padding:8px 12px;background:linear-gradient(90deg,#f1f5f9,#e2e8f0);border-left:4px solid var(--azul);border-radius:0 8px 8px 0">💡 Hallazgos clave</div>
+      <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:12px">
+        <button class="hltab active" onclick="showHltab(event,'hl-n')"
+          style="flex:1;padding:7px 0;font-size:12px;font-weight:800;border:none;cursor:pointer;
+                 color:#1d4ed8;border-bottom:2px solid #1d4ed8;margin-bottom:-2px;border-radius:6px 6px 0 0;
+                 background:#eff6ff;transition:all .15s">🆕 Nuevos</button>
+        <button class="hltab" onclick="showHltab(event,'hl-u')"
+          style="flex:1;padding:7px 0;font-size:12px;font-weight:800;border:none;cursor:pointer;
+                 color:var(--gris);border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:6px 6px 0 0;
+                 background:none;transition:all .15s">🚗 Usados</button>
+      </div>
+      <div id="hl-n" class="hltab-content" style="display:flex;flex-direction:column;gap:7px">
+        <div style="background:#fee2e2;border-left:3px solid var(--rojo);border-radius:0 8px 8px 0;padding:8px 10px">
+          <div style="font-size:11px;font-weight:700;color:var(--rojo)">🔴 VIP Nuevos: menor cierre real (4.0%)</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">El segmento más valioso tiene la conversión más baja en Nuevos. Solo 11 ventas sobre 277 leads.</div>
+        </div>
+        <div style="background:#fee2e2;border-left:3px solid var(--rojo);border-radius:0 8px 8px 0;padding:8px 10px">
+          <div style="font-size:11px;font-weight:700;color:var(--rojo)">🔴 Oro Nuevos: cierre desde calificado 88.4%</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">Una vez calificado, casi siempre compra — el problema es llegar a calificado (solo 9%).</div>
+        </div>
+        <div style="background:#fee2e2;border-left:3px solid var(--rojo);border-radius:0 8px 8px 0;padding:8px 10px">
+          <div style="font-size:11px;font-weight:700;color:var(--rojo)">🔴 Descarte Masivo domina en todos los segmentos Nuevos</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">VIP 50.5% · Oro 39.5% · Plata 37.1% · Bronce 29.5%. Revisión urgente del criterio.</div>
+        </div>
+        <div style="background:#f0fdf4;border-left:3px solid var(--verde);border-radius:0 8px 8px 0;padding:8px 10px">
+          <div style="font-size:11px;font-weight:700;color:var(--verde)">✅ VIP Nuevos: menor descuento global (2.2%)</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">Cuando cierran, lo hacen con el menor descuento del grupo en Nuevos.</div>
+        </div>
+        <div style="background:#f0fdf4;border-left:3px solid var(--verde);border-radius:0 8px 8px 0;padding:8px 10px">
+          <div style="font-size:11px;font-weight:700;color:var(--verde)">✅ Bronce Nuevos: mejor % cal→venta (48.2%)</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">Una vez calificados, casi la mitad cierra. El reto es subir la calificación (11.2%).</div>
+        </div>
+      </div>
+      <div id="hl-u" class="hltab-content" style="display:none;flex-direction:column;gap:7px">
+        <div style="background:#fee2e2;border-left:3px solid var(--rojo);border-radius:0 8px 8px 0;padding:8px 10px">
+          <div style="font-size:11px;font-weight:700;color:var(--rojo)">🔴 Bronce Usados: mejor calificado pero peor cierre</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">22.8% calificado pero solo 3.8% cierre. Problemas en negociación/tasación post-calificación.</div>
+        </div>
+        <div style="background:#fff7ed;border-left:3px solid var(--naranja);border-radius:0 8px 8px 0;padding:8px 10px">
+          <div style="font-size:11px;font-weight:700;color:var(--naranja)">⚠️ VIP Usados: mayor descuento, menor margen</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">6.3% descuento con 8.0% margen — peor ratio. La política perjudica al segmento premium.</div>
+        </div>
+        <div style="background:#fff7ed;border-left:3px solid var(--naranja);border-radius:0 8px 8px 0;padding:8px 10px">
+          <div style="font-size:11px;font-weight:700;color:var(--naranja)">⚠️ No contesta lidera descartes en Usados (19–23%)</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">Automatizar el primer contacto en Usados reduce esta pérdida en todos los segmentos.</div>
+        </div>
+        <div style="background:#f0fdf4;border-left:3px solid var(--verde);border-radius:0 8px 8px 0;padding:8px 10px">
+          <div style="font-size:11px;font-weight:700;color:var(--verde)">✅ Oro Usados: mejor margen del universo (14.4%)</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">Con solo 2.6% de descuento. El segmento más rentable cuando cierra.</div>
+        </div>
+        <div style="background:#f0fdf4;border-left:3px solid var(--verde);border-radius:0 8px 8px 0;padding:8px 10px">
+          <div style="font-size:11px;font-weight:700;color:var(--verde)">✅ Usados convierte al doble que Nuevos en todos los segmentos</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">19–23% calificados vs 9–13% en Nuevos. Mayor intención real del cliente VPP en Usados.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- fin fila inferior -->
+
+  <div class="nota"><strong>Metodología de cruce:</strong> Se identificaron ventas facturadas donde el cliente (por RUT) tenía un lead previo en el mismo tipo de negocio (Nuevos o Usados) y la fecha del lead era anterior a la fecha de facturación. El segmento de valor se obtuvo del archivo de leads, ya que en la base de oportunidades recién comenzó a registrarse en mayo 2026.</div>
+</div>
+
+<!-- ========== FUNNEL REAL ========== -->
+<div id="funnel" class="section">
+  <div class="section-title">🔄 Funnel Real: Lead → Calificado → Venta Facturada</div>
+
+  <div class="highlight">
+    <h4>Cómo leer este funnel</h4>
+    <p>Cada etapa muestra cuántos del total de leads llegaron a ese punto. <strong>Tasa calificado</strong> = lead que pasó a oportunidad. <strong>Tasa cierre</strong> = lead que terminó en venta facturada (cruce por RUT con oportunidades). <strong>% Cal→Venta</strong> = de los que se calificaron, cuántos cerraron.</p>
+  </div>
+
+  <!-- leyenda -->
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;padding:12px 16px;background:#f8fafc;border-radius:8px;border:1px solid var(--border)">
+    <span style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600"><span style="width:14px;height:14px;border-radius:3px;background:linear-gradient(90deg,#bfdbfe,#93c5fd);flex-shrink:0"></span>Leads recibidos</span>
+    <span style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600"><span style="width:14px;height:14px;border-radius:3px;background:linear-gradient(90deg,#3b82f6,#1d4ed8);flex-shrink:0"></span>Calificados (oportunidad)</span>
+    <span style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600"><span style="width:14px;height:14px;border-radius:3px;background:linear-gradient(90deg,#22c55e,#15803d);flex-shrink:0"></span>Venta facturada</span>
+    <span style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600"><span style="width:14px;height:14px;border-radius:3px;background:linear-gradient(90deg,#fca5a5,#ef4444);flex-shrink:0"></span>Descartados</span>
+    <span style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600"><span style="width:14px;height:14px;border-radius:3px;background:linear-gradient(90deg,#fde68a,#d97706);flex-shrink:0"></span>Desc. que compraron</span>
+  </div>
+
+  <div class="funnel-grid">
+
+    <!-- NUEVOS -->
+    <div class="funnel-block">
+      <h3>🆕 LÍNEA NUEVOS</h3>
+
+      <!-- VIP NUEVOS -->
+      <div class="fseg">
+        <div class="fseg-header h-vip">
+          <span class="badge vip">💎 VIP</span>
+          <span class="fseg-total">277 leads totales</span>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Leads recibidos</span>
+          <div class="frow-track"><div class="frow-fill leads wide" style="width:100%"><span>277 leads</span></div></div>
+          <div class="frow-meta"><span class="frow-n leads">277</span><span class="frow-pct leads">100%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Calificados</span>
+          <div class="frow-track"><div class="frow-fill calific" style="width:10.8%"></div></div>
+          <div class="frow-meta"><span class="frow-n calific">30</span><span class="frow-pct calific">10.8%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Venta facturada</span>
+          <div class="frow-track"><div class="frow-fill venta" style="width:4%"></div></div>
+          <div class="frow-meta"><span class="frow-n venta">11</span><span class="frow-pct venta">4.0%</span></div>
+        </div>
+        <div class="frow-sep"></div>
+        <div class="frow">
+          <span class="frow-label">Desc. que compraron</span>
+          <div class="frow-track"><div class="frow-fill recup" style="width:1.8%"></div></div>
+          <div class="frow-meta"><span class="frow-n recup">5</span><span class="frow-pct recup">1.8%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Descartados</span>
+          <div class="frow-track"><div class="frow-fill descart wide" style="width:78%"><span>216 perdidos</span></div></div>
+          <div class="frow-meta"><span class="frow-n descart">216</span><span class="frow-pct descart">78.0%</span></div>
+        </div>
+        <div class="fcal-ratio">% Calificados que cierran: <strong style="color:var(--rojo)">36.7%</strong></div>
+      </div>
+
+      <!-- ORO NUEVOS -->
+      <div class="fseg">
+        <div class="fseg-header h-oro">
+          <span class="badge oro">🥇 Oro</span>
+          <span class="fseg-total">476 leads totales</span>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Leads recibidos</span>
+          <div class="frow-track"><div class="frow-fill leads wide" style="width:100%"><span>476 leads</span></div></div>
+          <div class="frow-meta"><span class="frow-n leads">476</span><span class="frow-pct leads">100%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Calificados</span>
+          <div class="frow-track"><div class="frow-fill calific" style="width:9%"></div></div>
+          <div class="frow-meta"><span class="frow-n calific">43</span><span class="frow-pct calific">9.0%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Venta facturada</span>
+          <div class="frow-track"><div class="frow-fill venta" style="width:8%"></div></div>
+          <div class="frow-meta"><span class="frow-n venta">38</span><span class="frow-pct venta">8.0%</span></div>
+        </div>
+        <div class="frow-sep"></div>
+        <div class="frow">
+          <span class="frow-label">Desc. que compraron</span>
+          <div class="frow-track"><div class="frow-fill recup" style="width:4.6%"></div></div>
+          <div class="frow-meta"><span class="frow-n recup">22</span><span class="frow-pct recup">4.6%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Descartados</span>
+          <div class="frow-track"><div class="frow-fill descart wide" style="width:80.9%"><span>385 perdidos</span></div></div>
+          <div class="frow-meta"><span class="frow-n descart">385</span><span class="frow-pct descart">80.9%</span></div>
+        </div>
+        <div class="fcal-ratio">% Calificados que cierran: <strong style="color:var(--verde)">88.4% ✅</strong></div>
+      </div>
+
+      <!-- PLATA NUEVOS -->
+      <div class="fseg">
+        <div class="fseg-header h-plata">
+          <span class="badge plata">🥈 Plata</span>
+          <span class="fseg-total">343 leads totales</span>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Leads recibidos</span>
+          <div class="frow-track"><div class="frow-fill leads wide" style="width:100%"><span>343 leads</span></div></div>
+          <div class="frow-meta"><span class="frow-n leads">343</span><span class="frow-pct leads">100%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Calificados</span>
+          <div class="frow-track"><div class="frow-fill calific" style="width:13.4%"></div></div>
+          <div class="frow-meta"><span class="frow-n calific">46</span><span class="frow-pct calific">13.4%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Venta facturada</span>
+          <div class="frow-track"><div class="frow-fill venta" style="width:6.1%"></div></div>
+          <div class="frow-meta"><span class="frow-n venta">21</span><span class="frow-pct venta">6.1%</span></div>
+        </div>
+        <div class="frow-sep"></div>
+        <div class="frow">
+          <span class="frow-label">Desc. que compraron</span>
+          <div class="frow-track"><div class="frow-fill recup" style="width:3.8%"></div></div>
+          <div class="frow-meta"><span class="frow-n recup">13</span><span class="frow-pct recup">3.8%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Descartados</span>
+          <div class="frow-track"><div class="frow-fill descart wide" style="width:72.3%"><span>248 perdidos</span></div></div>
+          <div class="frow-meta"><span class="frow-n descart">248</span><span class="frow-pct descart">72.3%</span></div>
+        </div>
+        <div class="fcal-ratio">% Calificados que cierran: <strong>45.7%</strong></div>
+      </div>
+
+      <!-- BRONCE NUEVOS -->
+      <div class="fseg">
+        <div class="fseg-header h-bronce">
+          <span class="badge bronce">🥉 Bronce</span>
+          <span class="fseg-total">501 leads totales</span>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Leads recibidos</span>
+          <div class="frow-track"><div class="frow-fill leads wide" style="width:100%"><span>501 leads</span></div></div>
+          <div class="frow-meta"><span class="frow-n leads">501</span><span class="frow-pct leads">100%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Calificados</span>
+          <div class="frow-track"><div class="frow-fill calific" style="width:11.2%"></div></div>
+          <div class="frow-meta"><span class="frow-n calific">56</span><span class="frow-pct calific">11.2%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Venta facturada</span>
+          <div class="frow-track"><div class="frow-fill venta" style="width:5.4%"></div></div>
+          <div class="frow-meta"><span class="frow-n venta">27</span><span class="frow-pct venta">5.4%</span></div>
+        </div>
+        <div class="frow-sep"></div>
+        <div class="frow">
+          <span class="frow-label">Desc. que compraron</span>
+          <div class="frow-track"><div class="frow-fill recup" style="width:2.6%"></div></div>
+          <div class="frow-meta"><span class="frow-n recup">13</span><span class="frow-pct recup">2.6%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Descartados</span>
+          <div class="frow-track"><div class="frow-fill descart wide" style="width:77%"><span>386 perdidos</span></div></div>
+          <div class="frow-meta"><span class="frow-n descart">386</span><span class="frow-pct descart">77.0%</span></div>
+        </div>
+        <div class="fcal-ratio">% Calificados que cierran: <strong>48.2%</strong></div>
+      </div>
+    </div>
+
+    <!-- USADOS -->
+    <div class="funnel-block">
+      <h3>🚗 LÍNEA USADOS</h3>
+
+      <!-- VIP USADOS -->
+      <div class="fseg">
+        <div class="fseg-header h-vip">
+          <span class="badge vip">💎 VIP</span>
+          <span class="fseg-total">183 leads totales</span>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Leads recibidos</span>
+          <div class="frow-track"><div class="frow-fill leads wide" style="width:100%"><span>183 leads</span></div></div>
+          <div class="frow-meta"><span class="frow-n leads">183</span><span class="frow-pct leads">100%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Calificados</span>
+          <div class="frow-track"><div class="frow-fill calific" style="width:18%"></div></div>
+          <div class="frow-meta"><span class="frow-n calific">33</span><span class="frow-pct calific">18.0%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Venta facturada</span>
+          <div class="frow-track"><div class="frow-fill venta" style="width:7.1%"></div></div>
+          <div class="frow-meta"><span class="frow-n venta">13</span><span class="frow-pct venta">7.1%</span></div>
+        </div>
+        <div class="frow-sep"></div>
+        <div class="frow">
+          <span class="frow-label">Desc. que compraron</span>
+          <div class="frow-track"><div class="frow-fill recup" style="width:4.9%"></div></div>
+          <div class="frow-meta"><span class="frow-n recup">9</span><span class="frow-pct recup">4.9%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Descartados</span>
+          <div class="frow-track"><div class="frow-fill descart wide" style="width:77.6%"><span>142 perdidos</span></div></div>
+          <div class="frow-meta"><span class="frow-n descart">142</span><span class="frow-pct descart">77.6%</span></div>
+        </div>
+        <div class="fcal-ratio">% Calificados que cierran: <strong>39.4%</strong></div>
+      </div>
+
+      <!-- ORO USADOS -->
+      <div class="fseg">
+        <div class="fseg-header h-oro">
+          <span class="badge oro">🥇 Oro</span>
+          <span class="fseg-total">288 leads totales</span>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Leads recibidos</span>
+          <div class="frow-track"><div class="frow-fill leads wide" style="width:100%"><span>288 leads</span></div></div>
+          <div class="frow-meta"><span class="frow-n leads">288</span><span class="frow-pct leads">100%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Calificados</span>
+          <div class="frow-track"><div class="frow-fill calific" style="width:18.1%"></div></div>
+          <div class="frow-meta"><span class="frow-n calific">52</span><span class="frow-pct calific">18.1%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Venta facturada</span>
+          <div class="frow-track"><div class="frow-fill venta" style="width:6.9%"></div></div>
+          <div class="frow-meta"><span class="frow-n venta">20</span><span class="frow-pct venta">6.9%</span></div>
+        </div>
+        <div class="frow-sep"></div>
+        <div class="frow">
+          <span class="frow-label">Desc. que compraron</span>
+          <div class="frow-track"><div class="frow-fill recup" style="width:2.4%"></div></div>
+          <div class="frow-meta"><span class="frow-n recup">7</span><span class="frow-pct recup">2.4%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Descartados</span>
+          <div class="frow-track"><div class="frow-fill descart wide" style="width:76.4%"><span>220 perdidos</span></div></div>
+          <div class="frow-meta"><span class="frow-n descart">220</span><span class="frow-pct descart">76.4%</span></div>
+        </div>
+        <div class="fcal-ratio">% Calificados que cierran: <strong>38.5%</strong></div>
+      </div>
+
+      <!-- PLATA USADOS -->
+      <div class="fseg">
+        <div class="fseg-header h-plata">
+          <span class="badge plata">🥈 Plata</span>
+          <span class="fseg-total">213 leads totales</span>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Leads recibidos</span>
+          <div class="frow-track"><div class="frow-fill leads wide" style="width:100%"><span>213 leads</span></div></div>
+          <div class="frow-meta"><span class="frow-n leads">213</span><span class="frow-pct leads">100%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Calificados</span>
+          <div class="frow-track"><div class="frow-fill calific" style="width:19.2%"></div></div>
+          <div class="frow-meta"><span class="frow-n calific">41</span><span class="frow-pct calific">19.2%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Venta facturada</span>
+          <div class="frow-track"><div class="frow-fill venta" style="width:6.1%"></div></div>
+          <div class="frow-meta"><span class="frow-n venta">13</span><span class="frow-pct venta">6.1%</span></div>
+        </div>
+        <div class="frow-sep"></div>
+        <div class="frow">
+          <span class="frow-label">Desc. que compraron</span>
+          <div class="frow-track"><div class="frow-fill recup" style="width:3.3%"></div></div>
+          <div class="frow-meta"><span class="frow-n recup">7</span><span class="frow-pct recup">3.3%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Descartados</span>
+          <div class="frow-track"><div class="frow-fill descart wide" style="width:76.5%"><span>163 perdidos</span></div></div>
+          <div class="frow-meta"><span class="frow-n descart">163</span><span class="frow-pct descart">76.5%</span></div>
+        </div>
+        <div class="fcal-ratio">% Calificados que cierran: <strong>31.7%</strong></div>
+      </div>
+
+      <!-- BRONCE USADOS -->
+      <div class="fseg">
+        <div class="fseg-header h-bronce">
+          <span class="badge bronce">🥉 Bronce</span>
+          <span class="fseg-total">369 leads totales</span>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Leads recibidos</span>
+          <div class="frow-track"><div class="frow-fill leads wide" style="width:100%"><span>369 leads</span></div></div>
+          <div class="frow-meta"><span class="frow-n leads">369</span><span class="frow-pct leads">100%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Calificados</span>
+          <div class="frow-track"><div class="frow-fill calific" style="width:22.8%"></div></div>
+          <div class="frow-meta"><span class="frow-n calific">84</span><span class="frow-pct calific">22.8%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Venta facturada</span>
+          <div class="frow-track"><div class="frow-fill venta" style="width:3.8%"></div></div>
+          <div class="frow-meta"><span class="frow-n venta">14</span><span class="frow-pct venta">3.8%</span></div>
+        </div>
+        <div class="frow-sep"></div>
+        <div class="frow">
+          <span class="frow-label">Desc. que compraron</span>
+          <div class="frow-track"><div class="frow-fill recup" style="width:1.9%"></div></div>
+          <div class="frow-meta"><span class="frow-n recup">7</span><span class="frow-pct recup">1.9%</span></div>
+        </div>
+        <div class="frow">
+          <span class="frow-label">Descartados</span>
+          <div class="frow-track"><div class="frow-fill descart wide" style="width:72.9%"><span>269 perdidos</span></div></div>
+          <div class="frow-meta"><span class="frow-n descart">269</span><span class="frow-pct descart">72.9%</span></div>
+        </div>
+        <div class="fcal-ratio">% Calificados que cierran: <strong style="color:var(--rojo)">16.7% ⚠️</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="div">
+
+  <!-- TABLA RESUMEN FUNNEL -->
+  <p style="font-weight:700;font-size:13px;margin-bottom:12px">Tabla comparativa — Funnel completo por segmento y negocio</p>
+  <div class="tabs" style="margin-bottom:0">
+    <button class="tab2-btn active" onclick="showTab2(event,'tabf-n')">🆕 Nuevos</button>
+    <button class="tab2-btn" onclick="showTab2(event,'tabf-u')">🚗 Usados</button>
+  </div>
+
+  <div id="tabf-n" class="tab2-content active">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Segmento</th>
+            <th class="num">Leads</th>
+            <th class="num">Calificados</th><th>% Cal.</th>
+            <th class="num">Ventas reales</th><th>% Cal→Venta</th>
+            <th>% Cierre</th>
+            <th>Margen prom.</th><th>Desc. prom.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="badge oro">Oro</span></td><td class="num">476</td><td class="num">43</td><td>9.0%</td><td class="num bold">38</td><td><span style="color:var(--verde);font-weight:700">88.4% ✅</span></td><td><span style="color:var(--verde);font-weight:700">8.0%</span></td><td>11.1%</td><td>3.1%</td></tr>
+          <tr><td><span class="badge plata">Plata</span></td><td class="num">343</td><td class="num">46</td><td>13.4%</td><td class="num bold">21</td><td>45.7%</td><td>6.1%</td><td>10.6%</td><td>2.6%</td></tr>
+          <tr><td><span class="badge bronce">Bronce</span></td><td class="num">501</td><td class="num">56</td><td>11.2%</td><td class="num bold">27</td><td>48.2%</td><td>5.4%</td><td>10.3%</td><td>2.2%</td></tr>
+          <tr><td><span class="badge vip">VIP</span></td><td class="num">277</td><td class="num">30</td><td>10.8%</td><td class="num bold">11</td><td><span style="color:var(--rojo);font-weight:700">36.7%</span></td><td><span style="color:var(--rojo);font-weight:700">4.0% ⚠️</span></td><td>7.8%</td><td>2.2%</td></tr>
+          <tr style="background:#eff6ff;border-top:2px solid var(--azul)">
+            <td><strong style="color:var(--azul)">📊 Total Nuevos</strong></td>
+            <td class="num bold" style="color:var(--azul)">1.597</td>
+            <td class="num bold" style="color:var(--azul)">175</td><td style="color:var(--azul);font-weight:700">11.0%</td>
+            <td class="num bold" style="color:var(--azul)">97</td>
+            <td style="color:var(--azul);font-weight:700">55.4%</td>
+            <td style="color:var(--azul);font-weight:700">6.1%</td>
+            <td style="font-weight:800;color:var(--azul)">10.4%</td>
+            <td style="font-weight:800;color:var(--azul)">2.6%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="tabf-u" class="tab2-content">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Segmento</th>
+            <th class="num">Leads</th>
+            <th class="num">Calificados</th><th>% Cal.</th>
+            <th class="num">Ventas reales</th><th>% Cal→Venta</th>
+            <th>% Cierre</th>
+            <th>Margen prom.</th><th>Desc. prom.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="badge vip">VIP</span></td><td class="num">183</td><td class="num">33</td><td>18.0%</td><td class="num bold">13</td><td>39.4%</td><td><span style="color:var(--verde);font-weight:700">7.1%</span></td><td>8.0%</td><td style="color:var(--rojo);font-weight:700">6.3%</td></tr>
+          <tr><td><span class="badge oro">Oro</span></td><td class="num">288</td><td class="num">52</td><td>18.1%</td><td class="num bold">20</td><td>38.5%</td><td>6.9%</td><td><span style="color:var(--verde);font-weight:700">14.4% ✅</span></td><td>2.6%</td></tr>
+          <tr><td><span class="badge plata">Plata</span></td><td class="num">213</td><td class="num">41</td><td>19.2%</td><td class="num bold">13</td><td>31.7%</td><td>6.1%</td><td>11.2%</td><td>3.7%</td></tr>
+          <tr><td><span class="badge bronce">Bronce</span></td><td class="num">369</td><td class="num">84</td><td>22.8%</td><td class="num bold">14</td><td><span style="color:var(--rojo);font-weight:700">16.7%</span></td><td><span style="color:var(--rojo);font-weight:700">3.8% ⚠️</span></td><td>13.7%</td><td>2.1%</td></tr>
+          <tr style="background:#f0fdf4;border-top:2px solid var(--verde)">
+            <td><strong style="color:var(--verde)">📊 Total Usados</strong></td>
+            <td class="num bold" style="color:var(--verde)">1.053</td>
+            <td class="num bold" style="color:var(--verde)">210</td><td style="color:var(--verde);font-weight:700">19.9%</td>
+            <td class="num bold" style="color:var(--verde)">60</td>
+            <td style="color:var(--verde);font-weight:700">28.6%</td>
+            <td style="color:var(--verde);font-weight:700">5.7%</td>
+            <td style="font-weight:800;color:var(--verde)">12.2%</td>
+            <td style="font-weight:800;color:var(--verde)">3.5%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ========== VOLUMEN ========== -->
+<div id="volumen" class="section">
+  <div class="section-title">📊 Volumen de Leads por Segmento</div>
+
+  <!-- tabs grandes -->
+  <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:18px">
+    <button class="voltab active" onclick="showVoltab(event,'vol-n')"
+      style="flex:1;max-width:220px;padding:10px 0;font-size:13px;font-weight:800;border:none;cursor:pointer;
+             color:#1d4ed8;border-bottom:3px solid #1d4ed8;margin-bottom:-2px;border-radius:6px 6px 0 0;
+             background:#eff6ff;transition:all .15s">
+      🚗 NUEVOS &nbsp;<span style="font-size:16px;font-weight:900">1.599</span>
+    </button>
+    <button class="voltab" onclick="showVoltab(event,'vol-u')"
+      style="flex:1;max-width:220px;padding:10px 0;font-size:13px;font-weight:800;border:none;cursor:pointer;
+             color:var(--gris);border-bottom:3px solid transparent;margin-bottom:-2px;border-radius:6px 6px 0 0;
+             background:none;transition:all .15s">
+      🔄 USADOS &nbsp;<span style="font-size:16px;font-weight:900">1.053</span>
+    </button>
+  </div>
+
+  <!-- NUEVOS -->
+  <div id="vol-n" class="voltab-content" style="display:block">
+    <div class="seg-grid">
+      <div class="seg-card vip"><h3>💎 VIP</h3>
+        <div class="seg-stat"><span class="sl">Leads Nuevos</span><span class="sv">277</span></div>
+        <div class="seg-stat"><span class="sl">% línea Nuevos</span><span class="sv">17.3%</span></div>
+        <div class="seg-stat"><span class="sl">Ventas reales</span><span class="sv">11</span></div>
+        <div class="seg-stat"><span class="sl">Tasa cierre</span><span class="sv orange">4.0%</span></div>
+        <div class="seg-stat"><span class="sl">Desc. que compraron</span><span class="sv" style="color:#b45309">5 (1.8%)</span></div>
+      </div>
+      <div class="seg-card oro"><h3>🥇 Oro</h3>
+        <div class="seg-stat"><span class="sl">Leads Nuevos</span><span class="sv">476</span></div>
+        <div class="seg-stat"><span class="sl">% línea Nuevos</span><span class="sv orange">29.8%</span></div>
+        <div class="seg-stat"><span class="sl">Ventas reales</span><span class="sv">38</span></div>
+        <div class="seg-stat"><span class="sl">Tasa cierre</span><span class="sv green">8.0%</span></div>
+        <div class="seg-stat"><span class="sl">Desc. que compraron</span><span class="sv" style="color:#b45309">22 (4.6%)</span></div>
+      </div>
+      <div class="seg-card plata"><h3>🥈 Plata</h3>
+        <div class="seg-stat"><span class="sl">Leads Nuevos</span><span class="sv">343</span></div>
+        <div class="seg-stat"><span class="sl">% línea Nuevos</span><span class="sv">21.5%</span></div>
+        <div class="seg-stat"><span class="sl">Ventas reales</span><span class="sv">21</span></div>
+        <div class="seg-stat"><span class="sl">Tasa cierre</span><span class="sv">6.1%</span></div>
+        <div class="seg-stat"><span class="sl">Desc. que compraron</span><span class="sv" style="color:#b45309">13 (3.8%)</span></div>
+      </div>
+      <div class="seg-card bronce"><h3>🥉 Bronce</h3>
+        <div class="seg-stat"><span class="sl">Leads Nuevos</span><span class="sv">501</span></div>
+        <div class="seg-stat"><span class="sl">% línea Nuevos</span><span class="sv orange">31.3%</span></div>
+        <div class="seg-stat"><span class="sl">Ventas reales</span><span class="sv">27</span></div>
+        <div class="seg-stat"><span class="sl">Tasa cierre</span><span class="sv orange">5.4%</span></div>
+        <div class="seg-stat"><span class="sl">Desc. que compraron</span><span class="sv" style="color:#b45309">13 (2.6%)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- USADOS -->
+  <div id="vol-u" class="voltab-content" style="display:none">
+    <div class="seg-grid">
+      <div class="seg-card vip"><h3>💎 VIP</h3>
+        <div class="seg-stat"><span class="sl">Leads Usados</span><span class="sv">183</span></div>
+        <div class="seg-stat"><span class="sl">% línea Usados</span><span class="sv">17.4%</span></div>
+        <div class="seg-stat"><span class="sl">Ventas reales</span><span class="sv">13</span></div>
+        <div class="seg-stat"><span class="sl">Tasa cierre</span><span class="sv green">7.1%</span></div>
+        <div class="seg-stat"><span class="sl">Desc. que compraron</span><span class="sv" style="color:#b45309">9 (4.9%)</span></div>
+      </div>
+      <div class="seg-card oro"><h3>🥇 Oro</h3>
+        <div class="seg-stat"><span class="sl">Leads Usados</span><span class="sv">288</span></div>
+        <div class="seg-stat"><span class="sl">% línea Usados</span><span class="sv">27.4%</span></div>
+        <div class="seg-stat"><span class="sl">Ventas reales</span><span class="sv">20</span></div>
+        <div class="seg-stat"><span class="sl">Tasa cierre</span><span class="sv green">6.9%</span></div>
+        <div class="seg-stat"><span class="sl">Desc. que compraron</span><span class="sv" style="color:#b45309">7 (2.4%)</span></div>
+      </div>
+      <div class="seg-card plata"><h3>🥈 Plata</h3>
+        <div class="seg-stat"><span class="sl">Leads Usados</span><span class="sv">213</span></div>
+        <div class="seg-stat"><span class="sl">% línea Usados</span><span class="sv">20.2%</span></div>
+        <div class="seg-stat"><span class="sl">Ventas reales</span><span class="sv">13</span></div>
+        <div class="seg-stat"><span class="sl">Tasa cierre</span><span class="sv">6.1%</span></div>
+        <div class="seg-stat"><span class="sl">Desc. que compraron</span><span class="sv" style="color:#b45309">7 (3.3%)</span></div>
+      </div>
+      <div class="seg-card bronce"><h3>🥉 Bronce</h3>
+        <div class="seg-stat"><span class="sl">Leads Usados</span><span class="sv">369</span></div>
+        <div class="seg-stat"><span class="sl">% línea Usados</span><span class="sv orange">35.0%</span></div>
+        <div class="seg-stat"><span class="sl">Ventas reales</span><span class="sv">14</span></div>
+        <div class="seg-stat"><span class="sl">Tasa cierre</span><span class="sv orange">3.8%</span></div>
+        <div class="seg-stat"><span class="sl">Desc. que compraron</span><span class="sv" style="color:#b45309">7 (1.9%)</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== KPIS ========== -->
+<div id="kpis" class="section">
+  <div class="section-title">📊 KPIs por Línea</div>
+  <div class="tabs" style="border-bottom:2px solid var(--border);margin-bottom:18px">
+    <button class="tab5-btn active" onclick="showTab5(event,'kpis-nuevos')">🆕 Nuevos</button>
+    <button class="tab5-btn" onclick="showTab5(event,'kpis-usados')">🚗 Usados</button>
+  </div>
+
+  <!-- TAB NUEVOS -->
+  <div id="kpis-nuevos" class="tab5-content active">
+    <div class="two-col">
+      <div>
+        <p style="font-weight:700;font-size:13px;margin-bottom:10px">🏷️ Marcas con mayor cierre real (ventas desde lead)</p>
+        <div class="table-wrap">
+          <table><thead><tr><th>#</th><th>Marca</th><th class="num">Ventas</th></tr></thead>
+          <tbody>
+            <tr><td><span class="rank g">1</span></td><td>MG</td><td class="num bold">23</td></tr>
+            <tr><td><span class="rank s">2</span></td><td>CHEVROLET</td><td class="num bold">13</td></tr>
+            <tr><td><span class="rank b">3</span></td><td>Toyota</td><td class="num bold">11</td></tr>
+            <tr><td><span class="rank n">4</span></td><td>VOLKSWAGEN</td><td class="num bold">8</td></tr>
+            <tr><td><span class="rank n">5</span></td><td>PEUGEOT</td><td class="num bold">6</td></tr>
+            <tr><td></td><td>Nissan</td><td class="num bold">5</td></tr>
+            <tr><td></td><td>GAC</td><td class="num bold">4</td></tr>
+            <tr><td></td><td>CUPRA</td><td class="num bold">3</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div>
+        <p style="font-weight:700;font-size:13px;margin-bottom:10px">🏢 Sucursales con mayor cierre real (ventas desde lead)</p>
+        <div class="table-wrap">
+          <table><thead><tr><th>#</th><th>Sucursal</th><th class="num">Ventas</th></tr></thead>
+          <tbody>
+            <tr><td><span class="rank g">1</span></td><td>Toyota Irarrázaval</td><td class="num bold">8</td></tr>
+            <tr><td><span class="rank s">2</span></td><td>VW Prat</td><td class="num bold">5</td></tr>
+            <tr><td><span class="rank s">2</span></td><td>MG Plaza Oeste</td><td class="num bold">5</td></tr>
+            <tr><td><span class="rank b">4</span></td><td>MG Cerrillos</td><td class="num bold">4</td></tr>
+            <tr><td><span class="rank n">5</span></td><td>Concepción Chevrolet</td><td class="num bold">3</td></tr>
+            <tr><td><span class="rank n">5</span></td><td>ACSA Los Ángeles MG</td><td class="num bold">3</td></tr>
+            <tr><td><span class="rank n">5</span></td><td>Plaza Oeste Peugeot</td><td class="num bold">3</td></tr>
+            <tr><td><span class="rank n">5</span></td><td>MG San Martín</td><td class="num bold">3</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+    </div>
+    <hr class="div">
+    <p style="font-weight:700;font-size:13px;margin-bottom:10px">👤 Top vendedores NUEVOS — Venta real (mín. 5 leads)</p>
+    <div style="background:#fff7ed;border-left:3px solid var(--naranja);border-radius:0 6px 6px 0;padding:6px 10px;font-size:10px;color:var(--text2);margin-bottom:8px">
+      ⚠️ Varios vendedores con <strong>0 calificados</strong> igual cierran ventas — el lead llega descartado o el cliente va directo a sucursal.
+    </div>
+    <div class="table-wrap" style="margin-bottom:14px">
+      <table><thead><tr><th>#</th><th>Vendedor</th><th class="num">Tot.</th><th class="num">Ventas</th><th class="num">%Vta.</th><th class="num">Cal.</th><th class="num">%Cal.</th></tr></thead>
+      <tbody>
+        <tr><td><span class="rank g">1</span></td><td>Rodolfo Barbero <span style="font-size:9px;color:var(--naranja)">⚠️0cal</span></td><td class="num">60</td><td class="num bold" style="color:var(--verde)">8</td><td><span style="color:var(--verde);font-weight:700">13.3%</span></td><td class="num" style="color:var(--gris)">0</td><td class="num" style="color:var(--gris)">0%</td></tr>
+        <tr><td><span class="rank s">2</span></td><td>Marion S. Ibañez <span style="font-size:9px;color:var(--naranja)">⚠️0cal</span></td><td class="num">13</td><td class="num bold" style="color:var(--verde)">6</td><td>46.2%</td><td class="num" style="color:var(--gris)">0</td><td class="num" style="color:var(--gris)">0%</td></tr>
+        <tr><td><span class="rank s">2</span></td><td>Liliana Rojas <span style="font-size:9px;color:var(--naranja)">⚠️0cal</span></td><td class="num">78</td><td class="num bold" style="color:var(--verde)">6</td><td>7.7%</td><td class="num" style="color:var(--gris)">0</td><td class="num" style="color:var(--gris)">0%</td></tr>
+        <tr><td><span class="rank b">4</span></td><td>Georgina Moreno Rosas</td><td class="num">13</td><td class="num bold" style="color:var(--azul)">4</td><td>30.8%</td><td class="num">1</td><td class="num">7.7%</td></tr>
+        <tr><td><span class="rank b">4</span></td><td>Noelia Baeza <span style="font-size:9px;color:var(--naranja)">⚠️0cal</span></td><td class="num">41</td><td class="num bold" style="color:var(--azul)">4</td><td>9.8%</td><td class="num" style="color:var(--gris)">0</td><td class="num" style="color:var(--gris)">0%</td></tr>
+        <tr><td><span class="rank n">6</span></td><td>Felipe González Cofré</td><td class="num">9</td><td class="num bold" style="color:var(--azul)">3</td><td>33.3%</td><td class="num">2</td><td class="num">22.2%</td></tr>
+      </tbody></table>
+    </div>
+    <p style="font-weight:700;font-size:12px;margin-bottom:8px;color:var(--text2)">📊 Mejor vendedor por segmento — Top 5 por venta real</p>
+    <button class="acc-btn acc-vip" onclick="toggleAcc('acc-n-vip')"><span class="badge vip">💎 VIP</span><span style="flex:1">Marion S. Ibáñez · 1V · 100% <span style="font-size:10px;font-weight:400;color:var(--gris)">(empate 12 vendedores)</span></span><span class="acc-arrow">▼</span></button>
+    <div id="acc-n-vip" class="acc-body"><div class="table-wrap"><table style="font-size:11px"><thead><tr><th>#</th><th>Vendedor</th><th class="num">Leads</th><th class="num">Vtas</th><th class="num">%</th></tr></thead><tbody>
+      <tr><td><span class="rank g">1</span></td><td>Alex A. Jiménez Riquelme</td><td class="num">1</td><td class="num bold" style="color:var(--verde)">1</td><td><span style="color:var(--verde);font-weight:700">100%</span></td></tr>
+      <tr><td><span class="rank g">1</span></td><td>Kirllian F. Escalante</td><td class="num">1</td><td class="num bold" style="color:var(--verde)">1</td><td><span style="color:var(--verde);font-weight:700">100%</span></td></tr>
+      <tr><td><span class="rank g">1</span></td><td>Marion S. Ibáñez</td><td class="num">1</td><td class="num bold" style="color:var(--verde)">1</td><td><span style="color:var(--verde);font-weight:700">100%</span></td></tr>
+      <tr><td><span class="rank b">4</span></td><td>Bruno S. Sivoli Rodríguez</td><td class="num">2</td><td class="num bold">1</td><td>50.0%</td></tr>
+      <tr><td><span class="rank b">4</span></td><td>Livio A. García Ramírez</td><td class="num">2</td><td class="num bold">1</td><td>50.0%</td></tr>
+    </tbody></table></div><div style="font-size:10px;color:var(--gris);margin-top:6px">* 12 vendedores totales con 1 venta VIP NUEVOS</div></div>
+    <button class="acc-btn acc-oro" onclick="toggleAcc('acc-n-oro')"><span class="badge oro">🥇 Oro</span><span style="flex:1">Marion S. Ibáñez · 4V · 57.1%</span><span class="acc-arrow">▼</span></button>
+    <div id="acc-n-oro" class="acc-body"><div class="table-wrap"><table style="font-size:11px"><thead><tr><th>#</th><th>Vendedor</th><th class="num">Leads</th><th class="num">Vtas</th><th class="num">%</th></tr></thead><tbody>
+      <tr><td><span class="rank g">1</span></td><td>Marion S. Ibáñez</td><td class="num">7</td><td class="num bold" style="color:var(--verde)">4</td><td><span style="color:var(--verde);font-weight:700">57.1%</span></td></tr>
+      <tr><td><span class="rank g">1</span></td><td>Rodolfo Barbero</td><td class="num">18</td><td class="num bold" style="color:var(--verde)">4</td><td>22.2%</td></tr>
+      <tr><td><span class="rank b">3</span></td><td>José M. Hernández</td><td class="num">4</td><td class="num bold" style="color:var(--azul)">2</td><td>50.0%</td></tr>
+      <tr><td><span class="rank n">4</span></td><td>Bárbara V. Matos</td><td class="num">23</td><td class="num bold" style="color:var(--azul)">2</td><td>8.7%</td></tr>
+      <tr><td><span class="rank n">4</span></td><td>Liliana Rojas</td><td class="num">23</td><td class="num bold" style="color:var(--azul)">2</td><td>8.7%</td></tr>
+    </tbody></table></div></div>
+    <button class="acc-btn acc-plata" onclick="toggleAcc('acc-n-plata')"><span class="badge plata">🥈 Plata</span><span style="flex:1">Liliana Rojas · 3V · 18.8%</span><span class="acc-arrow">▼</span></button>
+    <div id="acc-n-plata" class="acc-body"><div class="table-wrap"><table style="font-size:11px"><thead><tr><th>#</th><th>Vendedor</th><th class="num">Leads</th><th class="num">Vtas</th><th class="num">%</th></tr></thead><tbody>
+      <tr><td><span class="rank g">1</span></td><td>Liliana Rojas</td><td class="num">16</td><td class="num bold" style="color:var(--verde)">3</td><td><span style="color:var(--verde);font-weight:700">18.8%</span></td></tr>
+      <tr><td><span class="rank g">1</span></td><td>Rodolfo Barbero</td><td class="num">19</td><td class="num bold" style="color:var(--verde)">3</td><td>15.8%</td></tr>
+      <tr><td><span class="rank b">3</span></td><td>Maria F. Cano Troncoso</td><td class="num">4</td><td class="num bold" style="color:var(--azul)">2</td><td>50.0%</td></tr>
+      <tr><td><span class="rank n">4</span></td><td>Carolina D. Toro</td><td class="num">2</td><td class="num bold">1</td><td>50.0%</td></tr>
+      <tr><td><span class="rank n">4</span></td><td>Felipe González Cofré</td><td class="num">2</td><td class="num bold">1</td><td>50.0%</td></tr>
+    </tbody></table></div></div>
+    <button class="acc-btn acc-bronce" onclick="toggleAcc('acc-n-bronce')"><span class="badge bronce">🥉 Bronce</span><span style="flex:1">Georgina Moreno Rosas · 3V · 50.0%</span><span class="acc-arrow">▼</span></button>
+    <div id="acc-n-bronce" class="acc-body"><div class="table-wrap"><table style="font-size:11px"><thead><tr><th>#</th><th>Vendedor</th><th class="num">Leads</th><th class="num">Vtas</th><th class="num">%</th></tr></thead><tbody>
+      <tr><td><span class="rank g">1</span></td><td>Georgina Moreno Rosas</td><td class="num">6</td><td class="num bold" style="color:var(--verde)">3</td><td><span style="color:var(--verde);font-weight:700">50.0%</span></td></tr>
+      <tr><td><span class="rank g">1</span></td><td>Noelia Baeza</td><td class="num">20</td><td class="num bold" style="color:var(--verde)">3</td><td>15.0%</td></tr>
+      <tr><td><span class="rank b">3</span></td><td>Bryan S. Ojeda Arcos</td><td class="num">1</td><td class="num bold">1</td><td>100%</td></tr>
+      <tr><td><span class="rank n">4</span></td><td>Daniel Monsalves</td><td class="num">1</td><td class="num bold">1</td><td>100%</td></tr>
+      <tr><td><span class="rank n">4</span></td><td>Lenny S. Ganderats Moreno</td><td class="num">1</td><td class="num bold">1</td><td>100%</td></tr>
+    </tbody></table></div></div>
+  </div>
+
+  <!-- TAB USADOS -->
+  <div id="kpis-usados" class="tab5-content">
+    <div class="two-col">
+      <div>
+        <p style="font-weight:700;font-size:13px;margin-bottom:10px">🏢 Sucursales con mayor cierre real (ventas desde lead)</p>
+        <div class="table-wrap">
+          <table><thead><tr><th>#</th><th>Sucursal</th><th class="num">Ventas</th></tr></thead>
+          <tbody>
+            <tr><td><span class="rank g">1</span></td><td>Usados Chillán Av Brasil 80</td><td class="num bold">5</td></tr>
+            <tr><td><span class="rank s">2</span></td><td>Usados Chillán Ecuador 768</td><td class="num bold">4</td></tr>
+            <tr><td><span class="rank b">3</span></td><td>Usados Las Animas P.A. Cerda</td><td class="num bold">3</td></tr>
+            <tr><td><span class="rank b">3</span></td><td>Usados Puerto Montt Benavente</td><td class="num bold">3</td></tr>
+            <tr><td><span class="rank b">3</span></td><td>Usados Autopark Departamental</td><td class="num bold">3</td></tr>
+            <tr><td><span class="rank b">3</span></td><td>Usados Los Ángeles Industrias</td><td class="num bold">3</td></tr>
+            <tr><td><span class="rank b">3</span></td><td>Usados Cerrillos Pedro A. Cerda</td><td class="num bold">3</td></tr>
+            <tr><td><span class="rank b">3</span></td><td>Usados Concepción Paicaví</td><td class="num bold">3</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div>
+        <p style="font-weight:700;font-size:13px;margin-bottom:10px">👤 Top vendedores USADOS — Venta real (mín. 5 leads)</p>
+        <div style="background:#fff7ed;border-left:3px solid var(--naranja);border-radius:0 6px 6px 0;padding:6px 10px;font-size:10px;color:var(--text2);margin-bottom:8px">
+          ⚠️ <strong>Roberto A. Pérez</strong> tiene 0 calificados pero igual cierra ventas — cliente va directo a sucursal o el lead no se gestiona en CRM.
+        </div>
+        <div class="table-wrap">
+          <table><thead><tr><th>#</th><th>Vendedor</th><th class="num">Tot.</th><th class="num">Ventas</th><th class="num">%Vta.</th><th class="num">Cal.</th><th class="num">%Cal.</th></tr></thead>
+          <tbody>
+            <tr><td><span class="rank g">1</span></td><td>Eduardo Delgado Martinez</td><td class="num">15</td><td class="num bold" style="color:var(--verde)">3</td><td><span style="color:var(--verde);font-weight:700">20.0%</span></td><td class="num">3</td><td class="num">20.0%</td></tr>
+            <tr><td><span class="rank s">2</span></td><td>Roberto A. Pérez Díaz <span style="font-size:9px;color:var(--naranja)">⚠️0cal</span></td><td class="num">5</td><td class="num bold" style="color:var(--verde)">2</td><td>40.0%</td><td class="num" style="color:var(--gris)">0</td><td class="num" style="color:var(--gris)">0%</td></tr>
+            <tr><td><span class="rank b">3</span></td><td>Karla A. Lobos Manzo</td><td class="num">8</td><td class="num bold" style="color:var(--azul)">2</td><td>25.0%</td><td class="num">6</td><td class="num" style="color:var(--verde)">75.0%</td></tr>
+            <tr><td><span class="rank b">3</span></td><td>Bastian E. Fierro Sandoval</td><td class="num">9</td><td class="num bold" style="color:var(--azul)">2</td><td>22.2%</td><td class="num">2</td><td class="num">22.2%</td></tr>
+            <tr><td><span class="rank b">3</span></td><td>José G. Reyes Linero</td><td class="num">9</td><td class="num bold" style="color:var(--azul)">2</td><td>22.2%</td><td class="num">1</td><td class="num">11.1%</td></tr>
+          </tbody></table>
+        </div>
+
+        <div style="margin-top:12px">
+          <p style="font-weight:700;font-size:12px;margin-bottom:8px;color:var(--text2)">📊 Mejor vendedor por segmento — Top 5 por venta real</p>
+          <button class="acc-btn acc-vip" onclick="toggleAcc('acc-u-vip')"><span class="badge vip">💎 VIP</span><span style="flex:1">Karla P. Ubilla · 2V · 66.7%</span><span class="acc-arrow">▼</span></button>
+          <div id="acc-u-vip" class="acc-body"><div class="table-wrap"><table style="font-size:11px"><thead><tr><th>#</th><th>Vendedor</th><th class="num">Leads</th><th class="num">Vtas</th><th class="num">%</th></tr></thead><tbody>
+            <tr><td><span class="rank g">1</span></td><td>Karla P. Ubilla Núñez</td><td class="num">3</td><td class="num bold" style="color:var(--verde)">2</td><td><span style="color:var(--verde);font-weight:700">66.7%</span></td></tr>
+            <tr><td><span class="rank s">2</span></td><td>Lisette A. Opazo Bárcena</td><td class="num">5</td><td class="num bold" style="color:var(--azul)">2</td><td>40.0%</td></tr>
+            <tr><td><span class="rank b">3</span></td><td>Víctor Ríos Velmar</td><td class="num">1</td><td class="num bold">1</td><td>100%</td></tr>
+            <tr><td><span class="rank n">4</span></td><td>Esteban I. Gaete Pizarro</td><td class="num">2</td><td class="num bold">1</td><td>50.0%</td></tr>
+            <tr><td><span class="rank n">4</span></td><td>Guillermo E. Benavides Molina</td><td class="num">2</td><td class="num bold">1</td><td>50.0%</td></tr>
+          </tbody></table></div></div>
+          <button class="acc-btn acc-oro" onclick="toggleAcc('acc-u-oro')"><span class="badge oro">🥇 Oro</span><span style="flex:1">Roberto A. Alvarez · 2V · 66.7%</span><span class="acc-arrow">▼</span></button>
+          <div id="acc-u-oro" class="acc-body"><div class="table-wrap"><table style="font-size:11px"><thead><tr><th>#</th><th>Vendedor</th><th class="num">Leads</th><th class="num">Vtas</th><th class="num">%</th></tr></thead><tbody>
+            <tr><td><span class="rank g">1</span></td><td>Roberto A. Alvarez Sanhueza</td><td class="num">3</td><td class="num bold" style="color:var(--verde)">2</td><td><span style="color:var(--verde);font-weight:700">66.7%</span></td></tr>
+            <tr><td><span class="rank s">2</span></td><td>Madeleine M. Noemi Zambrano</td><td class="num">10</td><td class="num bold" style="color:var(--azul)">2</td><td>20.0%</td></tr>
+            <tr><td><span class="rank b">3</span></td><td>Carla I. Riquelme Gutiérrez</td><td class="num">1</td><td class="num bold">1</td><td>100%</td></tr>
+            <tr><td><span class="rank n">4</span></td><td>César E. Saez Herrera</td><td class="num">1</td><td class="num bold">1</td><td>100%</td></tr>
+            <tr><td><span class="rank n">4</span></td><td>Juan B. Fierro Altamirano</td><td class="num">1</td><td class="num bold">1</td><td>100%</td></tr>
+          </tbody></table></div></div>
+          <button class="acc-btn acc-plata" onclick="toggleAcc('acc-u-plata')"><span class="badge plata">🥈 Plata</span><span style="flex:1">Empate · 1V máx. (24 vendedores)</span><span class="acc-arrow">▼</span></button>
+          <div id="acc-u-plata" class="acc-body"><div class="table-wrap"><table style="font-size:11px"><thead><tr><th>#</th><th>Vendedor</th><th class="num">Leads</th><th class="num">Vtas</th><th class="num">%</th></tr></thead><tbody>
+            <tr><td><span class="rank g">1</span></td><td>Angel E. Garboza De Las Rosas</td><td class="num">1</td><td class="num bold" style="color:var(--verde)">1</td><td><span style="color:var(--verde);font-weight:700">100%</span></td></tr>
+            <tr><td><span class="rank g">1</span></td><td>Carla I. Riquelme Gutiérrez</td><td class="num">1</td><td class="num bold" style="color:var(--verde)">1</td><td><span style="color:var(--verde);font-weight:700">100%</span></td></tr>
+            <tr><td><span class="rank g">1</span></td><td>Nicolás I. Mondaca Pérez</td><td class="num">1</td><td class="num bold" style="color:var(--verde)">1</td><td><span style="color:var(--verde);font-weight:700">100%</span></td></tr>
+            <tr><td><span class="rank b">4</span></td><td>Bastian E. Fierro Sandoval</td><td class="num">2</td><td class="num bold">1</td><td>50.0%</td></tr>
+            <tr><td><span class="rank b">4</span></td><td>Karla A. Lobos Manzo</td><td class="num">2</td><td class="num bold">1</td><td>50.0%</td></tr>
+          </tbody></table></div><div style="font-size:10px;color:var(--gris);margin-top:6px">* 24 vendedores con 1 venta Plata USADOS</div></div>
+          <button class="acc-btn acc-bronce" onclick="toggleAcc('acc-u-bronce')"><span class="badge bronce">🥉 Bronce</span><span style="flex:1">Sofia J. Esposto · 2V · 50.0%</span><span class="acc-arrow">▼</span></button>
+          <div id="acc-u-bronce" class="acc-body"><div class="table-wrap"><table style="font-size:11px"><thead><tr><th>#</th><th>Vendedor</th><th class="num">Leads</th><th class="num">Vtas</th><th class="num">%</th></tr></thead><tbody>
+            <tr><td><span class="rank g">1</span></td><td>Sofia de Jesus Esposto Arcaya</td><td class="num">4</td><td class="num bold" style="color:var(--verde)">2</td><td><span style="color:var(--verde);font-weight:700">50.0%</span></td></tr>
+            <tr><td><span class="rank s">2</span></td><td>José G. Reyes Linero</td><td class="num">5</td><td class="num bold" style="color:var(--azul)">2</td><td>40.0%</td></tr>
+            <tr><td><span class="rank b">3</span></td><td>Cristian A. Ramírez Montecino</td><td class="num">2</td><td class="num bold">1</td><td>50.0%</td></tr>
+            <tr><td><span class="rank n">4</span></td><td>Jose M. Lagos Morales</td><td class="num">2</td><td class="num bold">1</td><td>50.0%</td></tr>
+            <tr><td><span class="rank n">4</span></td><td>Julio Lopera Henao</td><td class="num">2</td><td class="num bold">1</td><td>50.0%</td></tr>
+          </tbody></table></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ========== DESCARTES ========== -->
+<div id="descartes" class="section">
+  <div class="section-title">❌ Motivos de Descarte por Segmento</div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab(event,'tab-n')">🆕 Nuevos</button>
+    <button class="tab-btn" onclick="showTab(event,'tab-u')">🚗 Usados</button>
+  </div>
+
+  <div id="tab-n" class="tab-content active">
+    <div class="seg-grid">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span class="badge vip">VIP</span><span style="font-size:11px;color:var(--gris)">216 descartados</span></div>
+        <div class="motivo-row"><span class="motivo-name">🔴 Descarte Masivo</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:100%;background:var(--rojo)"></div></div><span class="motivo-pct" style="color:var(--rojo)">50.5%</span></div>
+        <div class="motivo-row"><span class="motivo-name">No contesta</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:20%"></div></div><span class="motivo-pct">10.2%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Solo quería información</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:17%"></div></div><span class="motivo-pct">8.8%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Duplicado</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:13%"></div></div><span class="motivo-pct">6.5%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Desiste sin motivo</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:11%"></div></div><span class="motivo-pct">5.6%</span></div>
+        <div class="motivo-row"><span class="motivo-name">⚠️ Negativo por VPP</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:9%;background:var(--naranja)"></div></div><span class="motivo-pct" style="color:var(--naranja)">4.6%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Negativo por stock</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:7%"></div></div><span class="motivo-pct">3.7%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Negativo por precio</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:6%"></div></div><span class="motivo-pct">3.2%</span></div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span class="badge oro">Oro</span><span style="font-size:11px;color:var(--gris)">385 descartados</span></div>
+        <div class="motivo-row"><span class="motivo-name">🔴 Descarte Masivo</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:78%;background:var(--rojo)"></div></div><span class="motivo-pct" style="color:var(--rojo)">39.5%</span></div>
+        <div class="motivo-row"><span class="motivo-name">No contesta</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:22%"></div></div><span class="motivo-pct">11.2%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Solo quería información</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:19%"></div></div><span class="motivo-pct">9.4%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Duplicado</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:17%"></div></div><span class="motivo-pct">8.8%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Desiste sin motivo</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:15%"></div></div><span class="motivo-pct">7.5%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Negativo financiamiento</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:12%"></div></div><span class="motivo-pct">6.0%</span></div>
+        <div class="motivo-row"><span class="motivo-name">⚠️ Negativo por VPP</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:6%;background:var(--naranja)"></div></div><span class="motivo-pct" style="color:var(--naranja)">3.1%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Negativo por stock</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:6%"></div></div><span class="motivo-pct">2.9%</span></div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span class="badge plata">Plata</span><span style="font-size:11px;color:var(--gris)">248 descartados</span></div>
+        <div class="motivo-row"><span class="motivo-name">🔴 Descarte Masivo</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:74%;background:var(--rojo)"></div></div><span class="motivo-pct" style="color:var(--rojo)">37.1%</span></div>
+        <div class="motivo-row"><span class="motivo-name">No contesta</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:26%"></div></div><span class="motivo-pct">12.9%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Desiste sin motivo</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:18%"></div></div><span class="motivo-pct">9.3%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Solo quería información</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:17%"></div></div><span class="motivo-pct">8.5%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Duplicado</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:14%"></div></div><span class="motivo-pct">6.9%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Negativo financiamiento</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:10%"></div></div><span class="motivo-pct">4.8%</span></div>
+        <div class="motivo-row"><span class="motivo-name">⚠️ Negativo por VPP</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:9%;background:var(--naranja)"></div></div><span class="motivo-pct" style="color:var(--naranja)">4.4%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Compró en otro concesionario</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:6%"></div></div><span class="motivo-pct">3.2%</span></div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span class="badge bronce">Bronce</span><span style="font-size:11px;color:var(--gris)">386 descartados</span></div>
+        <div class="motivo-row"><span class="motivo-name">🔴 Descarte Masivo</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:59%;background:var(--rojo)"></div></div><span class="motivo-pct" style="color:var(--rojo)">29.5%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Solo quería información</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:31%"></div></div><span class="motivo-pct">15.3%</span></div>
+        <div class="motivo-row"><span class="motivo-name">No contesta</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:26%"></div></div><span class="motivo-pct">13.2%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Desiste sin motivo</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:19%"></div></div><span class="motivo-pct">9.3%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Negativo financiamiento</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:16%"></div></div><span class="motivo-pct">7.8%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Duplicado</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:11%"></div></div><span class="motivo-pct">5.7%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Negativo por stock</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:8%"></div></div><span class="motivo-pct">3.9%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Compró en otro concesionario</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:7%"></div></div><span class="motivo-pct">3.6%</span></div>
+      </div>
+    </div>
+    <div class="alert red" style="margin-top:14px"><span class="alert-icon">🔴</span><div class="alert-body"><strong>Descarte Masivo domina Nuevos en todos los segmentos</strong><span>VIP 50.5% · Oro 39.5% · Plata 37.1% · Bronce 29.5% — Revisar criterio. Posible fuga de leads de alto valor sin gestión individual.</span></div></div>
+  </div>
+
+  <div id="tab-u" class="tab-content">
+    <div class="seg-grid">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span class="badge vip">VIP</span><span style="font-size:11px;color:var(--gris)">142 descartados</span></div>
+        <div class="motivo-row"><span class="motivo-name">🔴 No contesta</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:100%;background:var(--rojo)"></div></div><span class="motivo-pct" style="color:var(--rojo)">23.2%</span></div>
+        <div class="motivo-row"><span class="motivo-name">⚠️ Negativo por stock</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:70%;background:var(--naranja)"></div></div><span class="motivo-pct" style="color:var(--naranja)">16.2%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Solo quería información</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:52%"></div></div><span class="motivo-pct">12.0%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Negativo financiamiento</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:37%"></div></div><span class="motivo-pct">8.5%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Desiste sin motivo</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:30%"></div></div><span class="motivo-pct">7.0%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Error lead (Web)</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:27%"></div></div><span class="motivo-pct">6.3%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Negativo por ubicación</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:21%"></div></div><span class="motivo-pct">4.9%</span></div>
+        <div class="motivo-row"><span class="motivo-name">⚠️ Negativo por VPP</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:18%;background:var(--naranja)"></div></div><span class="motivo-pct" style="color:var(--naranja)">4.2%</span></div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span class="badge oro">Oro</span><span style="font-size:11px;color:var(--gris)">220 descartados</span></div>
+        <div class="motivo-row"><span class="motivo-name">🔴 No contesta</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:100%;background:var(--rojo)"></div></div><span class="motivo-pct" style="color:var(--rojo)">21.4%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Solo quería información</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:79%"></div></div><span class="motivo-pct">16.8%</span></div>
+        <div class="motivo-row"><span class="motivo-name">⚠️ Negativo por stock</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:57%;background:var(--naranja)"></div></div><span class="motivo-pct" style="color:var(--naranja)">12.3%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Desiste sin motivo</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:51%"></div></div><span class="motivo-pct">10.9%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Negativo financiamiento</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:36%"></div></div><span class="motivo-pct">7.7%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Duplicado</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:30%"></div></div><span class="motivo-pct">6.4%</span></div>
+        <div class="motivo-row"><span class="motivo-name">⚠️ Negativo por VPP</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:26%;background:var(--naranja)"></div></div><span class="motivo-pct" style="color:var(--naranja)">5.5%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Ya atendido en sucursal</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:21%"></div></div><span class="motivo-pct">4.5%</span></div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span class="badge plata">Plata</span><span style="font-size:11px;color:var(--gris)">163 descartados</span></div>
+        <div class="motivo-row"><span class="motivo-name">🔴 No contesta</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:100%;background:var(--rojo)"></div></div><span class="motivo-pct" style="color:var(--rojo)">19.0%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Solo quería información</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:87%"></div></div><span class="motivo-pct">16.6%</span></div>
+        <div class="motivo-row"><span class="motivo-name">⚠️ Negativo por stock</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:62%;background:var(--naranja)"></div></div><span class="motivo-pct" style="color:var(--naranja)">11.7%</span></div>
+        <div class="motivo-row"><span class="motivo-name">⚠️ Negativo por VPP</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:45%;background:var(--naranja)"></div></div><span class="motivo-pct" style="color:var(--naranja)">8.6%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Desiste sin motivo</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:45%"></div></div><span class="motivo-pct">8.6%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Negativo financiamiento</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:35%"></div></div><span class="motivo-pct">6.7%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Error lead (Web)</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:35%"></div></div><span class="motivo-pct">6.7%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Duplicado</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:29%"></div></div><span class="motivo-pct">5.5%</span></div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span class="badge bronce">Bronce</span><span style="font-size:11px;color:var(--gris)">269 descartados</span></div>
+        <div class="motivo-row"><span class="motivo-name">🔴 No contesta</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:100%;background:var(--rojo)"></div></div><span class="motivo-pct" style="color:var(--rojo)">21.6%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Solo quería información</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:77%"></div></div><span class="motivo-pct">16.7%</span></div>
+        <div class="motivo-row"><span class="motivo-name">⚠️ Negativo por stock</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:60%;background:var(--naranja)"></div></div><span class="motivo-pct" style="color:var(--naranja)">13.0%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Desiste sin motivo</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:60%"></div></div><span class="motivo-pct">13.0%</span></div>
+        <div class="motivo-row"><span class="motivo-name">⚠️ Negativo por VPP</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:38%;background:var(--naranja)"></div></div><span class="motivo-pct" style="color:var(--naranja)">8.2%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Duplicado</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:36%"></div></div><span class="motivo-pct">7.8%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Negativo financiamiento</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:22%"></div></div><span class="motivo-pct">4.8%</span></div>
+        <div class="motivo-row"><span class="motivo-name">Ya atendido en sucursal</span><div class="motivo-bar"><div class="motivo-bar-fill" style="width:15%"></div></div><span class="motivo-pct">3.3%</span></div>
+      </div>
+    </div>
+    <div class="alert red" style="margin-top:14px"><span class="alert-icon">🔴</span><div class="alert-body"><strong>No contesta lidera todos los segmentos en Usados (19–23%)</strong><span>Integrar automatización de primer contacto en el flujo de leads VPP reduce esta pérdida directamente.</span></div></div>
+  </div>
+</div>
+
+<!-- ========== INSIGHTS ========== -->
+<div id="insights" class="section">
+  <div class="section-title">💡 Insights Estratégicos</div>
+  <div class="tabs" style="margin-bottom:0">
+    <button class="tab4-btn active" onclick="showTab4(event,'ins-n')">🆕 Nuevos</button>
+    <button class="tab4-btn" onclick="showTab4(event,'ins-u')">🚗 Usados</button>
+  </div>
+
+  <div id="ins-n" class="tab4-content active">
+    <div class="two-col" style="margin-top:16px">
+      <div>
+        <p style="font-weight:700;color:var(--verde);margin-bottom:10px;font-size:13px">✅ Positivos — Nuevos</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="alert green"><span class="alert-icon">🏆</span><div class="alert-body"><strong>Oro Nuevos: una vez calificado, casi siempre cierra (88.4%)</strong><span>El cuello de botella está en llegar a calificado (9%). Mejorar esa etapa en Oro Nuevos es la palanca de mayor impacto.</span></div></div>
+          <div class="alert green"><span class="alert-icon">⭐</span><div class="alert-body"><strong>VIP Nuevos: menor descuento global (2.2%)</strong><span>Cuando cierran, lo hacen con el menor descuento del grupo. Si se mejora la conversión, el margen se protege solo.</span></div></div>
+          <div class="alert green"><span class="alert-icon">📊</span><div class="alert-body"><strong>Bronce Nuevos: mejor % Cal→Venta (48.2%)</strong><span>Una vez calificados, casi la mitad cierra. El reto es subir la tasa de calificación desde el 11.2% actual.</span></div></div>
+        </div>
+      </div>
+      <div>
+        <p style="font-weight:700;color:var(--rojo);margin-bottom:10px;font-size:13px">🔴 Negativos — Nuevos</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="alert red"><span class="alert-icon">🚨</span><div class="alert-body"><strong>VIP Nuevos: peor tasa de cierre real (4.0%)</strong><span>El segmento de mayor valor cierra menos que todos. 50.5% de sus descartes son "Descarte Masivo" — revisar urgente.</span></div></div>
+          <div class="alert red"><span class="alert-icon">📉</span><div class="alert-body"><strong>Descarte Masivo domina Nuevos en todos los segmentos</strong><span>VIP 50.5% · Oro 39.5% · Plata 37.1% · Bronce 29.5%. Posible fuga de leads de alto valor sin gestión individual.</span></div></div>
+          <div class="alert orange"><span class="alert-icon">⚠️</span><div class="alert-body"><strong>Negativo por VPP activo en Nuevos (3–5% por segmento)</strong><span>La tasación es el punto de quiebre en Nuevos. El bono por segmento debe activarse antes de ese momento.</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ins-u" class="tab4-content">
+    <div class="two-col" style="margin-top:16px">
+      <div>
+        <p style="font-weight:700;color:var(--verde);margin-bottom:10px;font-size:13px">✅ Positivos — Usados</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="alert green"><span class="alert-icon">💰</span><div class="alert-body"><strong>Oro Usados: mejor margen real (14.4%) con descuento bajo (2.6%)</strong><span>El segmento más rentable cuando cierra en Usados. La política de fidelización debe proteger este ratio.</span></div></div>
+          <div class="alert green"><span class="alert-icon">📈</span><div class="alert-body"><strong>Usados convierte al doble que Nuevos en todos los segmentos</strong><span>19–23% calificados vs 9–13%. El cliente VPP tiene intención real más alta cuando busca un usado.</span></div></div>
+          <div class="alert green"><span class="alert-icon">⭐</span><div class="alert-body"><strong>Vendedores top con tasas de hasta 100% en segmentos Usados</strong><span>Matias Vega Torres (Plata Usados 100%), Pino Leiva (VIP Usados 80%). Mejores prácticas internas para escalar.</span></div></div>
+        </div>
+      </div>
+      <div>
+        <p style="font-weight:700;color:var(--rojo);margin-bottom:10px;font-size:13px">🔴 Negativos — Usados</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="alert red"><span class="alert-icon">📉</span><div class="alert-body"><strong>Bronce Usados: entra bien (22.8% calificado) pero casi no cierra (3.8%)</strong><span>Solo 16.7% de los calificados terminan en venta. El problema está en la negociación/tasación posterior.</span></div></div>
+          <div class="alert orange"><span class="alert-icon">⚠️</span><div class="alert-body"><strong>VIP Usados: mayor descuento (6.3%) y menor margen (8.0%)</strong><span>El segmento premium recibe más descuento que todos, con peor margen. La política actual perjudica al cliente de mayor valor.</span></div></div>
+          <div class="alert orange"><span class="alert-icon">⚠️</span><div class="alert-body"><strong>No contesta lidera descartes Usados en todos los segmentos (19–23%)</strong><span>Automatizar el primer contacto reduce directamente esta pérdida en toda la línea Usados. La respuesta estructural es una estrategia omnicanal con journeys diferenciados por segmento: al menos 3 intentos de contacto (WhatsApp + llamada + email) antes del descarte, con tiempos y mensajes adaptados al valor del cliente VPP.</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="div">
+  <div class="highlight">
+    <h4>🎯 Próximo paso — Journey y política de beneficios por segmento</h4>
+    <p>Los datos muestran que la política actual de descuento daña más al segmento VIP que a ningún otro (mayor descuento, menor margen, peor tasa de cierre). El siguiente paso es diseñar un beneficio diferenciado por segmento que actúe en el momento de la tasación para neutralizar "Negativo por VPP" — sin comprometer el margen. La propuesta debe cubrir el journey completo desde que el lead llega al CRM hasta la entrega del vehículo.</p>
+  </div>
+</div>
+
+</div>
+<div class="footer">
+  <span>Análisis Fidelización VPP 2026 · CRM OCRM</span>
+  <span>Fuente: leads + oportunidades totales 2026 · 157 ventas trazadas desde lead · Generado: 22-05-2026</span>
+</div>
+
+<script>
+function showTab(e,id){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+function showTab2(e,id){
+  document.querySelectorAll('.tab2-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab2-content').forEach(c=>c.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+function showTab3(e,id){
+  document.querySelectorAll('.tab3-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab3-content').forEach(c=>c.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+function showTab4(e,id){
+  document.querySelectorAll('.tab4-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab4-content').forEach(c=>c.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+    function showTab5(e,id){
+      document.querySelectorAll('.tab5-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.tab5-content').forEach(c=>c.classList.remove('active'));
+      e.target.classList.add('active');
+      document.getElementById(id).classList.add('active');
+    }
+function showMtab(e,id){
+  document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.mtab-content').forEach(c=>c.style.display='none');
+  e.target.classList.add('active');
+  document.getElementById(id).style.display='block';
+}
+function showMtabN(e,id){
+  document.querySelectorAll('.mtabn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.mtabn-content').forEach(c=>c.style.display='none');
+  e.target.classList.add('active');
+  document.getElementById(id).style.display='block';
+}
+function showMtabU(e,id){
+  document.querySelectorAll('.mtabu').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.mtabu-content').forEach(c=>c.style.display='none');
+  e.target.classList.add('active');
+  document.getElementById(id).style.display='block';
+}
+function showUtab(e,id){
+  document.querySelectorAll('.utab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.utab-content').forEach(c=>c.style.display='none');
+  e.target.classList.add('active');
+  document.getElementById(id).style.display='block';
+}
+function toggleAcc(id){
+  var b=document.getElementById(id);
+  var btn=b.previousElementSibling;
+  var open=b.style.display==='block';
+  b.style.display=open?'none':'block';
+  btn.classList.toggle('open',!open);
+}
+function showHltab(e,id){
+  document.querySelectorAll('.hltab').forEach(b=>{
+    b.classList.remove('active');
+    b.style.color='var(--gris)';
+    b.style.borderBottomColor='transparent';
+    b.style.background='none';
+  });
+  document.querySelectorAll('.hltab-content').forEach(c=>c.style.display='none');
+  e.target.classList.add('active');
+  e.target.style.color=id==='hl-n'?'#1d4ed8':'#16a34a';
+  e.target.style.borderBottomColor=id==='hl-n'?'#1d4ed8':'#16a34a';
+  e.target.style.background=id==='hl-n'?'#eff6ff':'#f0fdf4';
+  document.getElementById(id).style.display='flex';
+}
+function showVoltab(e,id){
+  document.querySelectorAll('.voltab').forEach(b=>{
+    b.classList.remove('active');
+    b.style.color='var(--gris)';
+    b.style.borderBottomColor='transparent';
+    b.style.background='none';
+  });
+  document.querySelectorAll('.voltab-content').forEach(c=>c.style.display='none');
+  var isNuevos=id==='vol-n';
+  e.target.classList.add('active');
+  e.target.style.color=isNuevos?'#1d4ed8':'#16a34a';
+  e.target.style.borderBottomColor=isNuevos?'#1d4ed8':'#16a34a';
+  e.target.style.background=isNuevos?'#eff6ff':'#f0fdf4';
+  document.getElementById(id).style.display='block';
+}
+function showBltab(e,id){
+  document.querySelectorAll('.bltab').forEach(b=>{
+    b.classList.remove('active');
+    b.style.color='var(--gris)';
+    b.style.borderBottomColor='transparent';
+    b.style.background='none';
+  });
+  document.querySelectorAll('.bltab-content').forEach(c=>c.style.display='none');
+  var isNuevos=id==='blt-n';
+  e.target.classList.add('active');
+  e.target.style.color=isNuevos?'#1d4ed8':'#16a34a';
+  e.target.style.borderBottomColor=isNuevos?'#1d4ed8':'#16a34a';
+  e.target.style.background=isNuevos?'#eff6ff':'#f0fdf4';
+  document.getElementById(id).style.display='block';
+}
+</script>
+</body>
+</html>
